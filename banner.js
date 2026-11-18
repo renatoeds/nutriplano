@@ -10,6 +10,7 @@
 //   link:     "#progresso" (tela do app) ou "https://..." (site externo)
 //   imagem:   caminho de uma imagem no projeto (ex.: "banner.jpg") ou ""
 //   fechavel: true deixa a pessoa fechar o banner (fica fechado no aparelho)
+//   paginas:  "todas" ou uma lista, ex.: ["diario","progresso"]
 // =====================================================================
 window.NP_BANNER = {
   ativo: true,
@@ -20,5 +21,6 @@ window.NP_BANNER = {
   botao: "Ver meu progresso",
   link: "#progresso",
   imagem: "",
-  fechavel: true
+  fechavel: true,
+  paginas: "todas"
 };

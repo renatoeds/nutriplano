@@ -39,7 +39,7 @@
   });
   function toastSafe(m){try{toast(m,1600)}catch(e){}}
   if(mq&&mq.addEventListener)mq.addEventListener("change",()=>{if(getTheme()==="auto"){applyTheme("auto");rerender()}});
-  window.addEventListener("hashchange",syncNav);
+  window.addEventListener("hashchange",()=>{syncNav();syncVisibility()});
   // ícones do menu superior
   document.querySelectorAll("#tabs a[data-v]").forEach(a=>a.insertAdjacentHTML("afterbegin",ic(a.dataset.v)));
   document.querySelectorAll("#bnav [data-v]").forEach(a=>a.insertAdjacentHTML("afterbegin",ic(a.dataset.v)));
@@ -49,7 +49,8 @@
   function renderPromo(){
     const el=document.getElementById("promo");if(!el)return;const B=window.NP_BANNER;
     let closed="";try{closed=localStorage.getItem("np-banner-closed")||""}catch(e){}
-    const show=B&&B.ativo&&B.titulo&&!(B.fechavel&&closed===B.id)&&document.body.classList.contains("np-in");
+    const pg=(location.hash.slice(1)||"diario");const okPage=!B||!Array.isArray(B.paginas)||B.paginas.includes(pg);
+    const show=B&&B.ativo&&B.titulo&&okPage&&!(B.fechavel&&closed===B.id)&&document.body.classList.contains("np-in");
     if(!show){el.hidden=true;el.innerHTML="";return}
     const ext=/^https?:\/\//.test(B.link||"");const e=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
     el.innerHTML=`<div class="promo${B.imagem?" has-img":""}" role="region" aria-label="Destaque">

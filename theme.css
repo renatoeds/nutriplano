@@ -333,3 +333,6 @@ body.np-in main{padding-top:18px}
   :root:not([data-theme="light"]) .water i{opacity:.35}
   @media (min-width:761px){:root:not([data-theme="light"]) body.np-in header.top{background:var(--header-bg);box-shadow:none}}
 }
+
+input[type=checkbox],input[type=radio]{accent-color:var(--accent);width:17px;height:17px}
+details summary::marker{color:var(--accent)}
