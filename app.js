@@ -769,7 +769,7 @@ function exportCSV(kind){
   const days=rangeDays(REP_N);let rows;
   if(kind==="days"){rows=[["Data","kcal","Meta kcal","Proteína (g)","Carboidrato (g)","Gordura (g)","Fibra (g)","Água (L)","Peso (kg)","Peso tendência (kg)","Treino","Gasto treino (kcal)","Suplementos","Anotação"]];
     const ser=weightSeries();const tmap={};ser.forEach(x=>tmap[x.d]=x.t);
-    days.forEach(d=>{const t=dayTotals(d),day=S.days[d]||{};rows.push([d,r0(t.kcal),dayTarget(d).kcal,dec(t.p),dec(t.c),dec(t.g),dec(t.fib),dec((day.water||0)/1000),dec(day.weight),dec(tmap[d]),workoutTxt(day),exKcal(d)||"",(typeof spList==="function"?spList().filter(sp=>day.supps&&day.supps[sp.id]).map(sp=>sp.name).join(", "):""),day.note||""])})}
+    days.forEach(d=>{const t=dayTotals(d),day=S.days[d]||{};rows.push([d,r0(t.kcal),dayTarget(d).kcal,dec(t.p),dec(t.c),dec(t.g),dec(t.fib),dec((day.water||0)/1000),dec(day.weight),dec(tmap[d]),workoutTxt(day),exKcal(d)||"",(typeof spList==="function"?spList().filter(sp=>day.supps&&day.supps[sp.id]).map(sp=>spTitle(sp)).join(", "):""),day.note||""])})}
   if(kind==="foods"){rows=[["Data","Refeição","Alimento","Quantidade","Gramas","kcal","Proteína (g)","Carboidrato (g)","Gordura (g)","Fibra (g)"]];
     days.forEach(d=>{const day=S.days[d];if(!day||!day.meals)return;MEALS.forEach(([k,n])=>(day.meals[k]||[]).forEach(i=>rows.push([d,n,i.name,itemQty(i),dec(i.q),r0(i.kcal),dec(i.p),dec(i.c),dec(i.g),dec(i.fib)])))})}
   if(kind==="train"){rows=[["Data","Treino","Tipo","Atividade","Séries (reps×kg)","Duração (min)","Distância (km)","Ritmo","Calorias"]];

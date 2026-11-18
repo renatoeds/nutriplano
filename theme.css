@@ -390,3 +390,5 @@ details summary::marker{color:var(--accent)}
 .supp-link>.ic{color:var(--accent)}
 .supp-prog{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px 22px}
 @media (max-width:640px){.supp-group{max-width:none}}
+.spf-link{border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.spf-link summary{font-weight:600;color:var(--ink);font-family:var(--font-ui)}
