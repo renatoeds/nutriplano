@@ -288,10 +288,11 @@ function renderDiario(){
       <label class="switch tiny muted" style="margin-top:8px"><input type="checkbox" id="incInput" ${day.incomplete?"checked":""}> Registro incompleto (não usar este dia no ajuste da dieta)</label>
     </div></div>
   <div class="grid">${meals}</div>
-  <div class="card" style="margin-top:14px"><label class="f">Anotações do dia<textarea id="noteInput" rows="2" placeholder="Fome, sono, humor, eventos…">${esc(day.note||"")}</textarea></label></div>`;
+  <div class="card" style="margin-top:14px"><label class="f">Anotações do dia<textarea id="noteInput" rows="2" placeholder="Fome, sono, humor, eventos…">${esc(day.note||"")}</textarea></label>
+  <div class="row" style="margin-top:10px"><span class="tiny muted" id="saveHint">Tudo é salvo automaticamente enquanto você usa.</span><span class="sp"></span><button class="btn pri" data-act="saveall">💾 Salvar dia</button></div></div>`;
   bindDayPicker();
   $("#wInput").addEventListener("change",e=>{const v=numv(e.target.value);const dd=getDay(d,true);dd.weight=v&&v>20?r1(v):null;saveDay(d);toast(dd.weight?"Peso registrado":"Peso removido")});
-  $("#noteInput").addEventListener("change",e=>{getDay(d,true).note=e.target.value;saveDay(d)});
+  $("#noteInput").addEventListener("input",e=>{getDay(d,true).note=e.target.value;saveDay(d)});
   $("#incInput").addEventListener("change",e=>{getDay(d,true).incomplete=e.target.checked;saveDay(d)});
 }
 
@@ -877,6 +878,9 @@ document.addEventListener("click",async e=>{
     case "delsaved":S.profile.saved=(S.profile.saved||[]).filter(x=>x.id!==b.dataset.id);saveProfile();render();break;
     case "trainday":getDay(d,true).train=b.dataset.v==="1";saveDay(d);render();break;
     case "water":{const day=getDay(d,true);day.water=Math.max(0,(day.water||0)+ +b.dataset.n);saveDay(d);render();break}
+    case "saveall":{const dd=getDay(d,true);const w=$("#wInput");if(w){const v=numv(w.value);dd.weight=v&&v>20?r1(v):null}const n=$("#noteInput");if(n)dd.note=n.value;saveDay(d);
+      b.disabled=true;b.textContent="Salvando…";for(const k of Object.keys(pending)){clearTimeout(timers[k]);await flush(k)}
+      b.disabled=false;b.textContent=hadError?"Tentar de novo":"✓ Salvo";if(!hadError){toast("Dia salvo");setTimeout(()=>{if(b.isConnected)b.textContent="💾 Salvar dia"},2000)}break}
     case "suppck":{const day=getDay(d,true);day.supps=day.supps||{};day.supps[b.dataset.id]=!day.supps[b.dataset.id];saveDay(d);render();break}
     case "suppadd":{const n=$("#sp_name").value.trim();if(!n){toast("Informe o suplemento");break}S.profile.supps=(S.profile.supps||[]).concat([{id:uid(),name:n,dose:$("#sp_dose").value.trim()}]);saveProfile();render();break}
     case "suppdel":S.profile.supps=(S.profile.supps||[]).filter(x=>x.id!==b.dataset.id);saveProfile();render();break;
