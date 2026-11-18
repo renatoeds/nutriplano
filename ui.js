@@ -5,7 +5,8 @@
 (function(){
   const LABEL={auto:"Tema automático (segue o sistema)",light:"Tema claro",dark:"Tema escuro"};
   const NEXT={auto:"light",light:"dark",dark:"auto"};
-  const MORE=[["coach","Ajuste da dieta"],["alimentos","Alimentos"],["calculadora","Calculadora"],["relatorio","Relatório"],["perfil","Perfil e metas"]];
+  const MORE0=[["coach","Ajuste da dieta"],["alimentos","Alimentos"],["calculadora","Calculadora"],["relatorio","Relatório"],["perfil","Perfil e metas"]];
+  const moreList=()=>(typeof S!=="undefined"&&S.pro)?[["alunos","Meus alunos"],...MORE0]:MORE0;
   const mq=window.matchMedia?matchMedia("(prefers-color-scheme: dark)"):null;
   const getTheme=()=>{try{const t=localStorage.getItem("np-theme");return t==="light"||t==="dark"?t:"auto"}catch(e){return "auto"}};
   function applyTheme(t){
@@ -18,7 +19,7 @@
   const rerender=()=>{try{if(S&&S.user&&S.booted&&S.profile)render()}catch(e){}};
   function syncNav(){
     const v=(location.hash.slice(1)||"diario");
-    document.querySelectorAll("#bnav [data-v]").forEach(a=>a.classList.toggle("on",a.dataset.v===v||(a.dataset.v==="mais"&&MORE.some(m=>m[0]===v))));
+    document.querySelectorAll("#bnav [data-v]").forEach(a=>a.classList.toggle("on",a.dataset.v===v||(a.dataset.v==="mais"&&moreList().some(m=>m[0]===v.split("/")[0]))));
   }
   let syncVisibility=function(){
     const tb=document.getElementById("topbar"),tabs=document.getElementById("tabs");
@@ -28,7 +29,7 @@
   function openMore(){
     showModal();
     document.getElementById("mbody").innerHTML=`<div class="mhead"><h3>Mais</h3><button class="iconbtn" data-act="close" aria-label="Fechar">${ic("x")}</button></div>
-      <div class="morelist">${MORE.map(([v,l])=>`<a href="#${v}" data-ui="go">${ic(v)}<span>${l}</span>${ic("chevR")}</a>`).join("")}</div>
+      <div class="morelist">${moreList().map(([v,l])=>`<a href="#${v}" data-ui="go">${ic(v)}<span>${l}</span>${ic("chevR")}</a>`).join("")}</div>
       <button class="btn ghost" data-ui="theme" style="margin-top:10px;width:100%;justify-content:center">${ic("auto")} Trocar tema</button>`;
   }
   document.addEventListener("click",e=>{

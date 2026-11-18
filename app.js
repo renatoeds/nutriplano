@@ -170,18 +170,19 @@ function streak(){let d=TODAY();if(!(dayKcal(d)>0))d=addDays(d,-1);let n=0;while
 function dayKm(d){const day=S.days[d];if(!day)return 0;return (day.workouts||[]).reduce((a,x)=>a+(x.type==="cardio"&&x.km>0?x.km:0),0)}
 
 /* ============ rotas ============ */
-const VIEWS=["diario","treino","progresso","corpo","coach","alimentos","calculadora","relatorio","perfil"];
+const VIEWS=["diario","treino","progresso","corpo","coach","alimentos","calculadora","relatorio","perfil","alunos"];
 let VIEW="diario";const charts={};
 function killCharts(){Object.keys(charts).forEach(k=>{try{charts[k].destroy()}catch(e){}delete charts[k]})}
-function route(){const h=location.hash.slice(1);VIEW=VIEWS.includes(h)?h:"diario";render()}
+function route(){let h=location.hash.slice(1);if(typeof PRO!=="undefined"){PRO.sel=null;if(h.startsWith("alunos/")){PRO.sel=decodeURIComponent(h.slice(7));h="alunos"}}VIEW=VIEWS.includes(h)?h:"diario";render()}
 window.addEventListener("hashchange",()=>{if(S.user&&S.booted)route()});
 function render(){
   killCharts();
   $("#topbar").style.display=S.user?"":"none";
   $$("#tabs a").forEach(a=>a.classList.toggle("on",a.dataset.v===VIEW));
   $("#tabs").style.visibility=S.profile?"visible":"hidden";
-  if(!S.profile){$("#app").innerHTML=onboardingHTML();bindProfileForm(true);const f=$("#impf");if(f)f.addEventListener("change",importFile);setSync();return}
-  ({diario:renderDiario,treino:renderTreino,progresso:renderProgresso,corpo:renderCorpo,coach:renderCoach,alimentos:renderAlimentos,calculadora:renderCalc,relatorio:renderRelatorio,perfil:renderPerfil})[VIEW]();
+  if(!S.profile&&S.pro&&VIEW==="alunos"){renderAlunos();setSync();window.scrollTo&&window.scrollTo(0,0);return}
+  if(!S.profile){$("#app").innerHTML=(S.pro?`<div class="card pro-onb"><b>Você está cadastrado como ${esc(PRO_KIND[S.pro.kind])}.</b> <span class="small muted">Para acompanhar seus alunos não precisa preencher nada.</span><a class="btn pri sm" href="#alunos">Ir para meus alunos</a></div>`:"")+onboardingHTML();bindProfileForm(true);const f=$("#impf");if(f)f.addEventListener("change",importFile);setSync();return}
+  ({diario:renderDiario,treino:renderTreino,progresso:renderProgresso,corpo:renderCorpo,coach:renderCoach,alimentos:renderAlimentos,calculadora:renderCalc,relatorio:renderRelatorio,perfil:renderPerfil,alunos:()=>renderAlunos()})[VIEW]();
   setSync();window.scrollTo&&window.scrollTo(0,0);
 }
 function dayBar(){
@@ -244,11 +245,12 @@ async function startAppInner(session){
   S.user=session.user;$("#app").innerHTML=`<div class="loading">Carregando seus dados…</div>`;
   const al=await sb.rpc("is_allowed");
   if(al.error||al.data!==true){AUTH.mode="denied";renderAuth();return}
-  const ad=await sb.rpc("is_admin");S.admin=ad.data===true;
+  const ad=await sb.rpc("is_admin");S.admin=ad.data===true;if(typeof proBoot==="function")await proBoot();
   try{await loadData()}catch(e){console.warn(e);$("#app").innerHTML=`<div class="card" style="max-width:520px;margin:40px auto">Não consegui carregar seus dados agora. Verifique a internet e <a href="">recarregue a página</a>.</div>`;return}
   S.booted=true;
   aiCall({action:"ping"}).then(r=>{S.ai=!!(r&&r.configured);if(S.ai&&(VIEW==="perfil"||VIEW==="progresso"))render()}).catch(()=>{S.ai=false});
   if(S.profile&&S.profile.autoApply&&checkinDue()){const pv=applyCheckin(true);setTimeout(()=>toast(`Check-in automático: nova meta ${nf(pv.targets.kcal)} kcal`,4000),400)}
+  if(S.pro&&!S.profile&&!location.hash.slice(1))location.hash="#alunos";
   route();
 }
 
@@ -818,7 +820,7 @@ function previewTargets(){
 }
 function onboardingHTML(){
   return `<div class="welcome"><div class="hero"><h1>Bem-vindo ao Nutri Plano</h1><p class="muted" style="margin:0">Registre o que come pela quantidade, acompanhe treinos e peso, e deixe a meta de calorias se ajustar sozinha toda semana.</p></div>
-  <div class="card"><h2>Seus dados</h2>${profileFormHTML(null,true)}<div style="margin-top:14px" id="pfprev"></div><div class="row" style="margin-top:14px"><label class="btn ghost small" style="cursor:pointer">Importar backup do Claude<input type="file" id="impf" accept=".json,application/json" hidden></label><span class="sp"></span><button class="btn pri" data-act="pfcreate">Começar</button></div></div>
+  <div class="card"><h2>Seus dados</h2>${profileFormHTML(null,true)}${typeof proOnboardField==="function"?proOnboardField():""}<div style="margin-top:14px" id="pfprev"></div><div class="row" style="margin-top:14px"><label class="btn ghost small" style="cursor:pointer">Importar backup do Claude<input type="file" id="impf" accept=".json,application/json" hidden></label><span class="sp"></span><button class="btn pri" data-act="pfcreate">Começar</button></div></div>
   <div class="row" style="margin-top:12px"><span class="tiny muted">${esc(S.user.email)}</span><span class="sp"></span><button class="btn sm ghost" data-act="logout">Sair</button></div></div>`;
 }
 async function renderAccessList(){
@@ -841,6 +843,8 @@ function renderPerfil(){
    ${S.admin?`<div class="card"><h2>Inteligência artificial</h2>${S.ai?`<p class="small" style="margin:0;display:flex;gap:8px;align-items:center"><span style="color:var(--accent)">${ic("check")}</span> Ativada — foto do prato, estimativa de alimentos e relatório semanal disponíveis.</p>`:`<p class="small" style="margin-top:0">Desativada. Para ativar: no painel do Supabase, abra o projeto <b>nutriplano</b> → <b>Edge Functions → Secrets</b> e crie <code>OPENAI_API_KEY</code> com a sua chave da OpenAI. Depois é só recarregar o app.</p>`}</div>`:""}
   </div><div>
    ${suppEditorHTML()}
+   ${typeof proStudentCardHTML==="function"?proStudentCardHTML():""}
+   ${S.admin&&typeof proAdminCardHTML==="function"?proAdminCardHTML():""}
    ${S.admin?`<div class="card" style="margin-bottom:14px"><h2>Quem pode acessar (admin)</h2><p class="small muted" style="margin-top:0">Só estes e-mails conseguem criar acesso. Depois de incluir, a pessoa entra em “Primeiro acesso” e cria a senha. Cada um vê só os próprios dados.</p>
     <div id="acl"><div class="small muted">Carregando…</div></div>
     <div class="row" style="margin-top:8px;flex-wrap:nowrap"><input type="text" id="acl_email" placeholder="email@exemplo.com" inputmode="email"><input type="text" id="acl_note" placeholder="nome (opcional)" style="max-width:150px"><button class="btn sm pri" data-act="acladd">Liberar</button></div>
@@ -850,7 +854,7 @@ function renderPerfil(){
     <p class="tiny muted">${Object.keys(S.days).length} dias registrados · ${(P.customFoods||[]).length} alimentos e receitas próprios</p></div>
    ${S.admin?`<div class="card"><h2>Referências</h2><ul class="small" style="padding-left:18px;margin:0;line-height:1.7"><li>Ajuste adaptativo de gasto inspirado no MacroFactor</li><li>Tendência de peso por média móvel exponencial</li><li>Gasto inicial: Mifflin-St Jeor</li><li>Alimentos: TACO (NEPA/UNICAMP) e TBCA (USP); suplementos pelo rótulo</li><li>Exercícios: Compêndio de Atividades Físicas (METs); corrida ≈ 1 kcal/kg/km</li></ul></div>`:""}
   </div></div><p class="foot">Ferramenta de acompanhamento — não substitui orientação de nutricionista ou médico.</p>`;
-  bindProfileForm();$("#impf").addEventListener("change",importFile);renderAccessList();
+  bindProfileForm();$("#impf").addEventListener("change",importFile);renderAccessList();if(typeof proBindPerfil==="function"){proBindPerfil();if(S.admin)proAdminList()}
   const cyp=()=>{const td=clamp(numv($("#cy_td").value)||4,1,6),sh=numv($("#cy_sh").value)||0;const T=P.targets;$("#cy_prev").innerHTML=`Treino: <b>${nf(Math.round((T.kcal+sh)/10)*10)}</b> kcal · Descanso: <b>${nf(Math.round((T.kcal-sh*td/(7-td))/10)*10)}</b> kcal`};
   ["cy_td","cy_sh"].forEach(id=>$("#"+id).addEventListener("input",cyp));cyp();
 }
@@ -867,7 +871,7 @@ document.addEventListener("click",async e=>{
   if(a.startsWith("au_")&&a!=="au_mode"){authAction(a);return}
   switch(a){
     case "au_mode":AUTH.mode=b.dataset.m;AUTH.msg="";AUTH.ok="";renderAuth();break;
-    case "logout":{for(const k of Object.keys(pending)){clearTimeout(timers[k]);await flush(k)}await sb.auth.signOut();location.hash="";break}
+    case "logout":{for(const k of Object.keys(pending)){clearTimeout(timers[k]);await flush(k)}await sb.auth.signOut();if(typeof proReset==="function"){proReset();S.pro=null;proNav()}location.hash="";break}
     case "day":S.date=addDays(S.date,+b.dataset.n);render();break;
     case "today":S.date=TODAY();render();break;
     case "goday":S.date=b.dataset.d;render();break;
@@ -930,7 +934,7 @@ document.addEventListener("click",async e=>{
       Object.assign(p,{goalWeight:p.goalWeight||null,customFoods:[],recent:[],saved:[],supps:[],addExercise:false,autoApply:false,created:TODAY()});
       p.tdee=Math.round(formulaTDEE(p,p.weight));p.targets=buildTargets(p,p.tdee,p.weight);p.lastCheckin=TODAY();p.lastWeight=p.weight;
       p.checkins=[{date:TODAY(),tdee:p.tdee,kcal:p.targets.kcal,p:p.targets.p,c:p.targets.c,g:p.targets.g,weight:p.weight,type:"inicial"}];
-      S.profile=p;saveProfile();const day=getDay(TODAY(),true);if(!day.weight){day.weight=r1(p.weight);saveDay(TODAY())}location.hash="#diario";route();toast("Tudo pronto! Registre sua primeira refeição.");break}
+      const pcode=(($("#ob_pcode")||{}).value||"").replace(/\D/g,"");S.profile=p;saveProfile();const day=getDay(TODAY(),true);if(!day.weight){day.weight=r1(p.weight);saveDay(TODAY())}if(pcode&&typeof PRO!=="undefined"){PRO.pendingCode=pcode;location.hash="#perfil";route();setTimeout(()=>{const c=$("#procard");if(c)c.scrollIntoView({block:"center"})},400);toast("Tudo pronto! Confirme o vínculo com seu profissional.");break}location.hash="#diario";route();toast("Tudo pronto! Registre sua primeira refeição.");break}
     case "pfsave":{const p=readProfileForm(S.profile);if(!p)break;p.addExercise=$("#pf_addex").checked;S.profile=p;const w=currentWeight()||p.weight;p.targets=buildTargets(p,p.tdee||formulaTDEE(p,w),w);saveProfile();toast("Metas atualizadas");render();break}
     case "pfformula":{const p=S.profile;const w=currentWeight()||p.weight;p.tdee=Math.round(formulaTDEE(p,w));p.targets=buildTargets(p,p.tdee,w);saveProfile();toast(`Gasto redefinido para ${nf(p.tdee)} kcal`);render();break}
     case "cysave":S.profile.cycle={on:$("#cy_on").checked,trainDays:clamp(numv($("#cy_td").value)||4,1,6),shift:Math.max(0,numv($("#cy_sh").value)||0)};saveProfile();toast("Ciclo salvo");render();break;
