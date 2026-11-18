@@ -504,14 +504,20 @@ function renderTreino(){
     ${h&&(h.last||h.best)?`<div class="hist">${h.last?`Última vez (${short(h.last.d)}): ${esc(setsTxt(h.last.sets))}`:""}${h.best?` · <span class="pr">Recorde: ${nf(h.best.kg,h.best.kg%1?1:0)} kg × ${h.best.r}</span> (1RM est. ${nf(h.best.e)} kg)`:""}</div>`:""}</div>`;
   }).join("");
   const recent=prevW.slice(0,8).map(x=>{const dd=S.days[x];const km=dayKm(x);return `<div class="kv"><span>${esc(fmtDate(x,{weekday:"short",day:"2-digit",month:"2-digit"}))} ${dd.wname?`· <b>${esc(dd.wname)}</b>`:""}</span><span class="muted small">${(dd.workouts||[]).length} ativ.${km?` · ${nf(km,1)} km`:""} <button class="btn sm ghost" data-act="goday" data-d="${x}">abrir</button></span></div>`}).join("");
+  const hasW=(day.workouts||[]).length>0,hasF=(day.workouts||[]).some(x=>x.type!=="cardio");
+  const addBtns=`<button class="btn pri" data-act="wadd" data-t="forca">${ic("plus",15)} Musculação</button><button class="btn" data-act="wadd" data-t="cardio">${ic("plus",15)} Corrida / cardio</button><button class="btn" data-act="wadd" data-t="luta">${ic("plus",15)} Kickboxing / luta</button>`;
+  const copySel=prevW.length?`<label class="f">Repetir um treino anterior<select id="wcopy"><option value="">Escolher…</option>${prevW.map(x=>`<option value="${x}">${esc(short(x)+" — "+(S.days[x].wname||((S.days[x].workouts||[]).map(w=>w.name||(CARDIO.find(c=>c[0]===w.ctype)||[,"Cardio"])[1]).slice(0,3).join(", "))))}</option>`).join("")}</select></label>`:"";
   $("#app").innerHTML=`${dayBar()}<div class="grid g2"><div>
-    <div class="card" style="margin-bottom:14px"><div class="form">
-      <label class="f">Nome do treino<input type="text" id="wname" value="${esc(day.wname||"")}" placeholder="ex: Treino A — Peito e tríceps"></label>
-      <label class="f">Duração da musculação (min)<input type="number" id="wmin" value="${day.wmin||""}" placeholder="ex: 60"></label>
-      ${prevW.length?`<label class="f">Repetir um treino anterior<select id="wcopy"><option value="">Escolher…</option>${prevW.map(x=>`<option value="${x}">${esc(short(x)+" — "+(S.days[x].wname||((S.days[x].workouts||[]).map(w=>w.name||(CARDIO.find(c=>c[0]===w.ctype)||[,"Cardio"])[1]).slice(0,3).join(", "))))}</option>`).join("")}</select></label>`:""}
+    ${hasW?`<div class="card" style="margin-bottom:14px"><div class="form">
+      <label class="f">Nome do treino (opcional)<input type="text" id="wname" value="${esc(day.wname||"")}" placeholder="ex: Treino A — Peito e tríceps"></label>
+      ${hasF||day.wmin?`<label class="f">Duração da musculação (min)<input type="number" id="wmin" value="${day.wmin||""}" placeholder="ex: 60"></label>`:""}
+      ${copySel}
     </div></div>
-    ${exHTML||`<div class="card empty" style="margin-bottom:10px">Nenhuma atividade neste dia. Adicione abaixo ou repita um treino anterior.</div>`}
-    <div class="row"><button class="btn pri" data-act="wadd" data-t="forca">${ic("plus",15)} Musculação</button><button class="btn" data-act="wadd" data-t="cardio">${ic("plus",15)} Corrida / cardio</button><button class="btn" data-act="wadd" data-t="luta">${ic("plus",15)} Kickboxing / luta</button></div>
+    ${exHTML}
+    <div class="row">${addBtns}</div>`
+    :`<div class="card w-empty" style="margin-bottom:14px"><h2 style="margin-top:0">Nenhum treino neste dia</h2><p class="small muted">O que você treinou? Escolha para começar.</p>
+      <div class="row">${addBtns}</div>
+      ${copySel?`<div class="form" style="margin-top:14px">${copySel}</div>`:""}</div>`}
     <datalist id="exlist">${EXERCISES.concat(knownExercises()).filter((v,i,a)=>a.indexOf(v)===i).map(e=>`<option value="${esc(e)}">`).join("")}</datalist>
   </div><div>
     <div class="grid g4" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
@@ -524,8 +530,8 @@ function renderTreino(){
     <p class="tiny muted" style="margin-bottom:0">O gasto do treino ${S.profile.addExercise?"está sendo <b>somado</b> à sua meta do dia":"<b>não</b> é somado à meta, porque o ajuste semanal já mede seu gasto real. Dá para mudar em Perfil"}.</p></div>
   </div></div>`;
   bindDayPicker();
-  $("#wname").addEventListener("change",e=>{getDay(d,true).wname=e.target.value;saveDay(d)});
-  $("#wmin").addEventListener("change",e=>{getDay(d,true).wmin=numv(e.target.value);saveDay(d);updTreinoSum()});
+  const wn=$("#wname");if(wn)wn.addEventListener("change",e=>{getDay(d,true).wname=e.target.value;saveDay(d)});
+  const wm=$("#wmin");if(wm)wm.addEventListener("change",e=>{getDay(d,true).wmin=numv(e.target.value);saveDay(d);updTreinoSum()});
   const wc=$("#wcopy");if(wc)wc.addEventListener("change",e=>{const src=S.days[e.target.value];if(!src)return;const dd=getDay(d,true);dd.workouts=dd.workouts.concat(clone(src.workouts||[]).map(x=>{if(x.type==="cardio"){delete x.kcalManual}return x}));if(!dd.wname)dd.wname=src.wname||"";if(!dd.wmin)dd.wmin=src.wmin||null;saveDay(d);render();toast("Treino copiado — ajuste os valores de hoje")});
   $$("[data-w]").forEach(el=>el.addEventListener("change",onWorkoutInput));
   $$("[data-w][data-f=min],[data-w][data-f=km]").forEach(el=>el.addEventListener("input",e=>{const i=e.target.dataset.w;const x=getDay(d,true).workouts[+i];const mn=$(`[data-w="${i}"][data-f=min]`),km=$(`[data-w="${i}"][data-f=km]`);const pc=$("#pace"+i);if(pc&&km)pc.textContent=paceTxt(numv(mn.value),numv(km.value))}));
