@@ -7,9 +7,14 @@ create table if not exists public.professionals (
   kind       text not null check (kind in ('nutri','personal')),
   name       text not null check (char_length(name) between 2 and 80),
   code       text not null unique check (code ~ '^[0-9]{4,6}$'),
+  reg_number text not null check (reg_number ~ '^[0-9A-Za-z./ -]{3,20}$'),
+  reg_state  text not null check (reg_state in ('AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO')),
+  reg_checked_at timestamptz default now(),
+  requested  boolean not null default false,
   active     boolean not null default true,
   created_at timestamptz not null default now()
 );
+comment on column public.professionals.reg_number is 'CRN (nutricionista) ou CREF (personal) — obrigatório; o admin confere no site do conselho antes de cadastrar';
 alter table public.professionals enable row level security;
 revoke all on public.professionals from anon;
 create policy "admin gerencia profissionais" on public.professionals
@@ -67,9 +72,9 @@ $$;
 
 -- aluno: consulta o nome do profissional pelo código (não expõe e-mail)
 create or replace function public.pro_lookup(p_code text)
-returns table(name text, kind text)
+returns table(name text, kind text, reg_number text, reg_state text)
 language sql stable security definer set search_path = '' as $$
-  select p.name, p.kind from public.professionals p
+  select p.name, p.kind, p.reg_number, p.reg_state from public.professionals p
   where public.is_allowed() and p.active and p.code = trim(p_code) and p.email <> public.my_email();
 $$;
 
@@ -90,11 +95,33 @@ begin
   return query select v.name, v.kind;
 end $$;
 
+-- usuário liberado pede para ser profissional no primeiro acesso (fica PAUSADO até o admin aprovar)
+create or replace function public.pro_request(p_kind text, p_name text, p_reg text, p_uf text)
+returns text
+language plpgsql security definer set search_path = '' as $$
+declare em text := public.my_email(); c text; tries int := 0;
+begin
+  if not public.is_allowed() or auth.uid() is null then raise exception 'not_allowed'; end if;
+  if exists (select 1 from public.professionals p where p.email = em and not p.requested) then raise exception 'already_pro'; end if;
+  loop
+    tries := tries + 1;
+    c := lpad((floor(random()*9000)+1000)::int::text, 4, '0');
+    if tries > 40 then c := lpad((floor(random()*900000)+100000)::int::text, 6, '0'); end if;
+    exit when not exists (select 1 from public.professionals p where p.code = c);
+  end loop;
+  insert into public.professionals(email, kind, name, code, reg_number, reg_state, reg_checked_at, requested, active)
+  values (em, p_kind, left(trim(p_name),80), c, upper(trim(p_reg)), upper(trim(p_uf)), null, true, false)
+  on conflict (email) do update set kind = excluded.kind, name = excluded.name, reg_number = excluded.reg_number,
+    reg_state = excluded.reg_state, created_at = now()
+    where public.professionals.requested;
+  return 'pending';
+end $$;
+
 -- aluno: meus profissionais
 create or replace function public.my_pros()
-returns table(pro_email text, name text, kind text, share_photos boolean, student_name text, created_at timestamptz)
+returns table(pro_email text, name text, kind text, share_photos boolean, student_name text, created_at timestamptz, reg_number text, reg_state text)
 language sql stable security definer set search_path = '' as $$
-  select l.pro_email, p.name, p.kind, l.share_photos, l.student_name, l.created_at
+  select l.pro_email, p.name, p.kind, l.share_photos, l.student_name, l.created_at, p.reg_number, p.reg_state
   from public.pro_links l join public.professionals p on p.email = l.pro_email
   where l.student_id = auth.uid() and public.is_allowed()
   order by l.created_at;
@@ -171,7 +198,10 @@ create policy "fotos: profissional autorizado lê" on storage.objects
 -- permissões das funções: ninguém sem login; só as que o app chama ficam expostas
 revoke execute on function public.my_email(), public.my_pro_kind(), public.pro_link_of(uuid),
   public.pro_lookup(text), public.pro_link(text,text,boolean), public.my_pros(), public.pro_students(),
-  public.pro_student(uuid,date), public.pro_can_see_photos(text) from public, anon;
-grant execute on function public.pro_lookup(text), public.pro_link(text,text,boolean), public.my_pros(),
+  public.pro_student(uuid,date), public.pro_can_see_photos(text), public.pro_request(text,text,text,text) from public, anon;
+grant execute on function public.pro_request(text,text,text,text), public.pro_lookup(text), public.pro_link(text,text,boolean), public.my_pros(),
   public.pro_students(), public.pro_student(uuid,date), public.pro_can_see_photos(text),
   public.my_email(), public.my_pro_kind(), public.pro_link_of(uuid) to authenticated;
+
+-- funções auxiliares só são usadas por dentro das outras: não ficam expostas na API
+revoke execute on function public.my_email(), public.my_pro_kind(), public.pro_link_of(uuid) from authenticated, anon, public;

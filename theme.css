@@ -438,3 +438,11 @@ details summary::marker{color:var(--accent)}
 .warnc{color:#B45309}
 .pro-onb{display:flex;gap:10px;align-items:center;flex-wrap:wrap;max-width:760px;margin:0 auto 14px}
 .pro-onb .btn{margin-left:auto}
+.pro-regchk{margin-top:10px;padding:9px 12px;border-radius:10px;background:var(--soft);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pro-roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.pro-role{display:flex;flex-direction:column;gap:4px;text-align:left;padding:14px;border:1.5px solid var(--line);border-radius:14px;background:var(--card);color:var(--text);cursor:pointer;font:inherit}
+.pro-role:hover{border-color:var(--accent)}
+.pro-role.on{border-color:var(--accent);background:var(--soft);box-shadow:0 0 0 3px var(--ring)}
+.pro-hide{display:none}
+.pro-pend{display:flex;gap:12px;align-items:flex-start;border-color:#F59E0B}
+.tag-warn{background:rgba(245,158,11,.16);color:#B45309}

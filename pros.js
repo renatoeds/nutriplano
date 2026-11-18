@@ -3,13 +3,17 @@
    O filtro do que cada profissional vê e a regra de só leitura ficam no banco (funções pro_*).
    Aqui só exibimos; nada nesta tela grava dados do aluno. */
 const PRO_KIND={nutri:"Nutricionista",personal:"Personal trainer"};
+const PRO_COUNCIL={nutri:"CRN",personal:"CREF"};
+const PRO_UF="AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO".split(" ");
+const proReg=p=>p&&p.reg_number?`${PRO_COUNCIL[p.kind]} ${p.reg_number}/${p.reg_state}`:"";
+function proRegLink(kind,num,uf){return kind==="nutri"?"https://cfn.org.br/consulta-nacional-de-nutricionistas":`https://www.google.com/search?q=${encodeURIComponent(`consulta registro CREF ${num||""} ${uf||""} profissional de educação física`)}`}
 const PRO={list:null,cache:{},sel:null,day:null,loading:false,err:null,pendingCode:null,found:null,mine:null};
 
 /* ---------- inicialização ---------- */
-function proReset(){Object.assign(PRO,{list:null,cache:{},sel:null,day:null,err:null,pendingCode:null,found:null,mine:null,adm:null,sname:null})}
+function proReset(){if(typeof S!=="undefined")S.proPending=null;Object.assign(PRO,{role:"aluno",list:null,cache:{},sel:null,day:null,err:null,pendingCode:null,found:null,mine:null,adm:null,sname:null})}
 async function proBoot(){
   S.pro=null;proReset();
-  try{const {data}=await sb.from("professionals").select("kind,name,code,active").eq("email",String(S.user.email||"").toLowerCase()).maybeSingle();if(data&&data.active)S.pro=data}catch(e){}
+  try{const {data}=await sb.from("professionals").select("kind,name,code,active,requested,reg_number,reg_state").eq("email",String(S.user.email||"").toLowerCase()).maybeSingle();S.proPending=null;if(data&&data.active)S.pro=data;else if(data&&data.requested)S.proPending=data}catch(e){}
   proNav();
 }
 function proNav(){
@@ -47,7 +51,7 @@ function proSummary(st){
 function renderAlunos(){
   if(!S.pro){$("#app").innerHTML=`<div class="card" style="max-width:560px"><h2>Área do profissional</h2><p class="small muted" style="margin:0">Esta área é para nutricionistas e personal trainers cadastrados pelo administrador.</p></div>`;return}
   if(PRO.sel)return renderAluno(PRO.sel);
-  $("#app").innerHTML=`<div class="row" style="margin-bottom:14px"><h1 style="margin:0">Meus alunos</h1><span class="sp"></span><span class="tag tag-ok">${esc(PRO_KIND[S.pro.kind])}</span>${S.profile?"":`<button class="btn sm" data-act="logout">${ic("logout",15)} Sair</button>`}</div>
+  $("#app").innerHTML=`<div class="row" style="margin-bottom:14px"><h1 style="margin:0">Meus alunos</h1><span class="sp"></span><span class="tag tag-ok">${esc(PRO_KIND[S.pro.kind])} · ${esc(proReg(S.pro))}</span>${S.profile?"":`<button class="btn sm" data-act="logout">${ic("logout",15)} Sair</button>`}</div>
   <div class="card pro-code" style="margin-bottom:14px"><div><div class="small muted">Seu código para os alunos</div><div class="pro-code-n num">${esc(S.pro.code)}</div></div>
    <p class="small muted" style="margin:0">O aluno digita este código em <b>Perfil → Nutricionista e personal</b> e escolhe compartilhar com você. Você só consegue <b>ver</b> os dados — nunca alterar.</p></div>
   <div id="prolist"><div class="loading">Carregando alunos…</div></div>${S.profile?"":`<p class="small muted" style="margin-top:14px">Quer usar o Nutri Plano para você também? <a href="#diario">Preencher meus dados</a></p>`}`;
@@ -162,7 +166,7 @@ function proStudentCardHTML(){
    <div id="profind" style="margin-top:10px"></div></div>`;
 }
 function proFindHTML(){
-  if(PRO.found)return `<div class="pro-confirm"><div class="small muted">Vincular à</div><div style="font-size:17px;font-weight:700;margin:2px 0 10px">${esc(PRO_KIND[PRO.found.kind])} ${esc(PRO.found.name)}?</div>
+  if(PRO.found)return `<div class="pro-confirm"><div class="small muted">Vincular à</div><div style="font-size:17px;font-weight:700;margin:2px 0 2px">${esc(PRO_KIND[PRO.found.kind])} ${esc(PRO.found.name)}?</div><div class="small muted" style="margin-bottom:10px">${ic("shieldok",14)} Registro ${esc(proReg(PRO.found))} · <a href="${esc(proRegLink(PRO.found.kind,PRO.found.reg_number,PRO.found.reg_state))}" target="_blank" rel="noopener noreferrer">conferir no conselho</a></div>
     <label class="f">Seu nome (como o profissional vai ver)<input type="text" id="pro_sname" maxlength="80" value="${esc(PRO.sname||"")}" placeholder="ex: Renato Silva"></label>
     <label class="switch small" style="margin-top:8px"><input type="checkbox" id="pro_photos"> Compartilhar também minhas fotos de progresso</label>
     <div class="row" style="margin-top:12px"><button class="btn ghost" data-pro="cancel">Cancelar</button><span class="sp"></span><button class="btn pri" data-pro="link">${ic("check",15)} Vincular</button></div></div>`;
@@ -174,7 +178,7 @@ async function proBindPerfil(){
   const el=$("#promine");if(!el)return;
   try{const {data,error}=await sb.rpc("my_pros");if(error)throw error;PRO.mine=data||[]}catch(e){el.innerHTML=`<div class="small muted">Não consegui carregar seus vínculos.</div>`;return}
   if(!$("#promine"))return;
-  $("#promine").innerHTML=PRO.mine.length?PRO.mine.map(x=>`<div class="pro-link"><div><b>${esc(x.name)}</b> <span class="tag">${esc(PRO_KIND[x.kind])}</span><div class="tiny muted">Vê seus dados como “${esc(x.student_name)}” desde ${esc(short(String(x.created_at).slice(0,10)))}</div>
+  $("#promine").innerHTML=PRO.mine.length?PRO.mine.map(x=>`<div class="pro-link"><div><b>${esc(x.name)}</b> <span class="tag">${esc(PRO_KIND[x.kind])}</span> <span class="tag num">${esc(proReg(x))}</span><div class="tiny muted">Vê seus dados como “${esc(x.student_name)}” desde ${esc(short(String(x.created_at).slice(0,10)))}</div>
      <label class="switch tiny" style="margin-top:6px"><input type="checkbox" data-pro="photos" data-email="${esc(x.pro_email)}" ${x.share_photos?"checked":""}> Compartilhar fotos de progresso</label></div>
      <button class="btn sm ghost" data-pro="unlink" data-email="${esc(x.pro_email)}" data-name="${esc(x.name)}">Cancelar vínculo</button></div>`).join(""):`<div class="small muted">Nenhum profissional vinculado.</div>`;
   if(PRO.pendingCode&&!PRO.found){const c=PRO.pendingCode;proFind(c)}
@@ -201,25 +205,39 @@ function proAdminCardHTML(){
   return `<div class="card" style="margin-bottom:14px"><h2>Profissionais (admin)</h2><p class="small muted" style="margin-top:0">Cadastre nutricionistas e personal trainers. O e-mail entra na lista de acesso automaticamente. O profissional passa o código aos alunos.</p>
    <div id="proadm"><div class="small muted">Carregando…</div></div>
    <div class="form" style="margin-top:10px"><label class="f">Nome<input type="text" id="pa_name" maxlength="80" placeholder="ex: Ana Souza"></label><label class="f">E-mail<input type="text" id="pa_email" inputmode="email" placeholder="email@exemplo.com"></label>
-    <label class="f">Tipo<select id="pa_kind"><option value="nutri">Nutricionista</option><option value="personal">Personal trainer</option></select></label><label class="f">Código (4 a 6 números)<input type="text" id="pa_code" inputmode="numeric" maxlength="6"></label></div>
+    <label class="f">Tipo<select id="pa_kind"><option value="nutri">Nutricionista</option><option value="personal">Personal trainer</option></select></label><label class="f">Código (4 a 6 números)<input type="text" id="pa_code" inputmode="numeric" maxlength="6"></label>
+    <label class="f"><span id="pa_reglbl">Número do CRN</span><input type="text" id="pa_reg" maxlength="20" placeholder="ex: 12345"></label><label class="f">Estado do registro<select id="pa_uf"><option value="">UF</option>${PRO_UF.map(u=>`<option>${u}</option>`).join("")}</select></label></div>
+   <div class="pro-regchk small" id="pa_regbox"></div>
+   <label class="switch small" style="margin-top:8px"><input type="checkbox" id="pa_ok"> Conferi no site do conselho que o registro existe, está ativo e é desta pessoa</label>
    <div class="row" style="margin-top:10px"><span class="sp"></span><button class="btn pri" data-pro="admadd">${ic("plus",15)} Cadastrar profissional</button></div></div>`;
 }
 async function proAdminList(){
   const el=$("#proadm");if(!el)return;
-  const {data,error}=await sb.from("professionals").select("*").order("created_at");
+  const {data,error}=await sb.from("professionals").select("*").order("requested",{ascending:false}).order("created_at");
   if(error){el.innerHTML=`<div class="small muted">Não consegui carregar (a função de profissionais ainda não foi ativada no banco).</div>`;return}
   PRO.adm=data||[];
   const ci=$("#pa_code");if(ci&&!ci.value){let c;do{c=String(1000+Math.floor(Math.random()*9000))}while(PRO.adm.some(p=>p.code===c));ci.value=c}
-  el.innerHTML=PRO.adm.length?PRO.adm.map(p=>`<div class="kv"><span><b>${esc(p.name)}</b> <span class="tag">${esc(PRO_KIND[p.kind])}</span> <span class="tag num">${esc(p.code)}</span>${p.active?"":' <span class="tag">pausado</span>'}<div class="tiny muted">${esc(p.email)}</div></span><span class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn sm ghost" data-pro="admtoggle" data-email="${esc(p.email)}" data-on="${p.active?1:0}">${p.active?"Pausar":"Reativar"}</button><button class="iconbtn" data-pro="admdel" data-email="${esc(p.email)}" data-name="${esc(p.name)}" aria-label="Remover">${ic("x",16)}</button></span></div>`).join(""):`<div class="small muted">Nenhum profissional cadastrado.</div>`;
+  proAdmReg();
+  el.innerHTML=PRO.adm.length?PRO.adm.map(p=>`<div class="kv"><span><b>${esc(p.name)}</b> <span class="tag">${esc(PRO_KIND[p.kind])}</span> <span class="tag num">código ${esc(p.code)}</span>${p.requested&&!p.active?' <span class="tag tag-warn">aguardando aprovação</span>':p.active?"":' <span class="tag">pausado</span>'}<div class="tiny muted">${esc(p.email)} · ${esc(proReg(p))} <a href="${esc(proRegLink(p.kind,p.reg_number,p.reg_state))}" target="_blank" rel="noopener noreferrer">conferir</a></div></span><span class="row" style="gap:4px;flex-wrap:nowrap">${p.requested&&!p.active?`<button class="btn sm pri" data-pro="admok" data-email="${esc(p.email)}" data-reg="${esc(proReg(p))}">Aprovar</button>`:""}${p.requested&&!p.active?"":`<button class="btn sm ghost" data-pro="admtoggle" data-email="${esc(p.email)}" data-on="${p.active?1:0}">${p.active?"Pausar":"Reativar"}</button>`}<button class="iconbtn" data-pro="admdel" data-email="${esc(p.email)}" data-name="${esc(p.name)}" aria-label="Remover">${ic("x",16)}</button></span></div>`).join(""):`<div class="small muted">Nenhum profissional cadastrado.</div>`;
+}
+function proAdmReg(){
+  const k=($("#pa_kind")||{}).value;if(!k)return;const num=($("#pa_reg").value||"").trim(),uf=$("#pa_uf").value;
+  $("#pa_reglbl").textContent=k==="nutri"?"Número do CRN":"Número do CREF";
+  $("#pa_reg").placeholder=k==="nutri"?"ex: 12345":"ex: 012345-G";
+  $("#pa_regbox").innerHTML=`${ic("shield",14)} Antes de cadastrar, confira o registro: <a href="${esc(proRegLink(k,num,uf))}" target="_blank" rel="noopener noreferrer">${k==="nutri"?"Consulta Nacional de Nutricionistas (CFN)":"buscar o CREF informado"}</a>${k==="personal"?` · <a href="https://www.confef.org.br/" target="_blank" rel="noopener noreferrer">site do CONFEF</a>`:""}`;
 }
 async function proAdminAdd(){
   const name=$("#pa_name").value.trim(),email=$("#pa_email").value.trim().toLowerCase(),kind=$("#pa_kind").value,code=$("#pa_code").value.replace(/\D/g,"");
+  const reg=$("#pa_reg").value.trim().toUpperCase(),uf=$("#pa_uf").value;
+  if(!/^[0-9A-Z./ -]{3,20}$/.test(reg)){toast(`Informe o número do ${PRO_COUNCIL[kind]}`);$("#pa_reg").focus();return}
+  if(!uf){toast("Escolha o estado do registro");return}
+  if(!$("#pa_ok").checked){toast("Confira o registro no site do conselho e marque a confirmação");return}
   if(name.length<2){toast("Digite o nome");return}if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){toast("E-mail inválido");return}if(!/^\d{4,6}$/.test(code)){toast("O código precisa ter de 4 a 6 números");return}
   const al=await sb.from("allowed_emails").select("email").eq("email",email).maybeSingle();
   if(!al.data){const r=await sb.from("allowed_emails").insert({email,is_admin:false,note:`${PRO_KIND[kind]} ${name}`});if(r.error){toast("Não consegui liberar o e-mail");return}}
-  const {error}=await sb.from("professionals").insert({email,kind,name,code});
+  const {error}=await sb.from("professionals").insert({email,kind,name,code,reg_number:reg,reg_state:uf});
   if(error){toast(/code|duplicate|unique/i.test(error.message||"")?"Esse código ou e-mail já está em uso":"Não consegui cadastrar");return}
-  toast(`${name} cadastrado(a) — código ${code}`);["pa_name","pa_email","pa_code"].forEach(i=>$("#"+i).value="");proAdminList();if(typeof renderAccessList==="function")renderAccessList();
+  toast(`${name} cadastrado(a) — código ${code}`);["pa_name","pa_email","pa_code","pa_reg","pa_uf"].forEach(i=>$("#"+i).value="");$("#pa_ok").checked=false;proAdminList();if(typeof renderAccessList==="function")renderAccessList();
 }
 
 /* ---------- eventos ---------- */
@@ -232,11 +250,38 @@ document.addEventListener("click",async e=>{
   else if(a==="link")proLink();
   else if(a==="unlink"){if(!confirmBox(`Cancelar o vínculo com ${b.dataset.name}? Ele deixa de ver seus dados na hora.`))return;const {error}=await sb.from("pro_links").delete().eq("student_id",S.user.id).eq("pro_email",b.dataset.email);toast(error?"Não consegui cancelar":"Vínculo cancelado");proBindPerfil()}
   else if(a==="admadd")proAdminAdd();
+  else if(a==="role"){PRO.role=b.dataset.role;render()}
+  else if(a==="request")proRequest();
+  else if(a==="admok"){if(!confirmBox(`Você conferiu no site do conselho que o registro ${b.dataset.reg} existe, está ativo e é desta pessoa?`))return;const {error}=await sb.from("professionals").update({active:true,requested:false,reg_checked_at:new Date().toISOString()}).eq("email",b.dataset.email);toast(error?"Não consegui aprovar":"Profissional aprovado");proAdminList()}
   else if(a==="admtoggle"){const {error}=await sb.from("professionals").update({active:b.dataset.on!=="1"}).eq("email",b.dataset.email);if(error)toast("Não consegui alterar");proAdminList()}
   else if(a==="admdel"){if(!confirmBox(`Remover ${b.dataset.name}? Os vínculos com alunos são apagados (o e-mail continua na lista de acesso).`))return;const {error}=await sb.from("professionals").delete().eq("email",b.dataset.email);toast(error?"Não consegui remover":"Profissional removido");proAdminList()}
 });
+document.addEventListener("input",e=>{if(e.target&&["pa_reg"].includes(e.target.id))proAdmReg()});
 document.addEventListener("change",async e=>{
-  const t=e.target;if(t.dataset&&t.dataset.pro==="photos"){const {error}=await sb.from("pro_links").update({share_photos:t.checked}).eq("student_id",S.user.id).eq("pro_email",t.dataset.email);toast(error?"Não consegui salvar":t.checked?"Fotos compartilhadas":"Fotos não são mais compartilhadas");if(error)t.checked=!t.checked}
+  const t=e.target;if(t&&["pa_kind","pa_uf"].includes(t.id))proAdmReg();if(t.dataset&&t.dataset.pro==="photos"){const {error}=await sb.from("pro_links").update({share_photos:t.checked}).eq("student_id",S.user.id).eq("pro_email",t.dataset.email);toast(error?"Não consegui salvar":t.checked?"Fotos compartilhadas":"Fotos não são mais compartilhadas");if(error)t.checked=!t.checked}
 });
 /* confirmação simples sem diálogo nativo do navegador */
 function confirmBox(msg){return window.__npConfirm?window.__npConfirm(msg):window.confirm(msg)}
+
+/* ---------- primeiro acesso: aluno, personal ou nutricionista ---------- */
+function proOnboardWrap(html){
+  const role=PRO.role||"aluno",pend=S.proPending;
+  const pick=pend?`<div class="card pro-pend" style="margin-bottom:14px">${ic("bell",18)}<div><b>Pedido enviado: ${esc(PRO_KIND[pend.kind])} · ${esc(proReg(pend))}</b><div class="small muted">O administrador vai conferir seu registro no conselho e liberar a área "Meus alunos". Entre de novo depois da aprovação. Enquanto isso, se quiser, use o app para você preenchendo seus dados abaixo.</div></div></div>`
+   :`<div class="card" style="margin-bottom:14px"><h2>Como você vai usar o Nutri Plano?</h2><div class="pro-roles" role="radiogroup">${[["aluno","Sou aluno","Registro minha alimentação, treinos e peso"],["personal","Sou personal trainer","Acompanho meus alunos (precisa de CREF)"],["nutri","Sou nutricionista","Acompanho meus pacientes (precisa de CRN)"]].map(([k,t,s])=>`<button type="button" class="pro-role ${role===k?"on":""}" data-pro="role" data-role="${k}" role="radio" aria-checked="${role===k}"><b>${t}</b><span class="small muted">${s}</span></button>`).join("")}</div></div>`;
+  const req=!pend&&role!=="aluno"?`<div class="card"><h2>Cadastro de ${esc(PRO_KIND[role])}</h2><p class="small muted" style="margin-top:0">Seu acesso de profissional é liberado depois que o administrador conferir o registro no ${role==="nutri"?"CRN":"CREF"}. Você só consegue ver (nunca alterar) os dados dos alunos que vincularem a conta a você.</p>
+    <div class="form"><label class="f">Nome completo (como no conselho)<input type="text" id="pr_name" maxlength="80"></label><label class="f">Número do ${role==="nutri"?"CRN":"CREF"}<input type="text" id="pr_reg" maxlength="20" placeholder="${role==="nutri"?"ex: 12345":"ex: 012345-G"}"></label><label class="f">Estado do registro<select id="pr_uf"><option value="">UF</option>${PRO_UF.map(u=>`<option>${u}</option>`).join("")}</select></label></div>
+    <label class="switch small" style="margin-top:10px"><input type="checkbox" id="pr_ok"> Declaro que o registro é meu e está ativo</label>
+    <div class="row" style="margin-top:14px"><span class="sp"></span><button class="btn pri" data-pro="request">Enviar para aprovação</button></div></div>`:"";
+  html=html.replace('<div class="card"><h2>Seus dados</h2>',pick+req+`<div class="card ${!pend&&role!=="aluno"?"pro-hide":""}"><h2>Seus dados</h2>`);
+  return html;
+}
+async function proRequest(){
+  const kind=PRO.role,name=$("#pr_name").value.trim(),reg=$("#pr_reg").value.trim().toUpperCase(),uf=$("#pr_uf").value;
+  if(name.length<2){toast("Digite seu nome completo");return}
+  if(!/^[0-9A-Z./ -]{3,20}$/.test(reg)){toast(`Informe o número do ${PRO_COUNCIL[kind]}`);return}
+  if(!uf){toast("Escolha o estado do registro");return}
+  if(!$("#pr_ok").checked){toast("Marque a declaração do registro");return}
+  const {error}=await sb.rpc("pro_request",{p_kind:kind,p_name:name,p_reg:reg,p_uf:uf});
+  if(error){toast(/already_pro/.test(error.message||"")?"Você já é profissional cadastrado":"Não consegui enviar. Tente de novo.");return}
+  S.proPending={kind,name,reg_number:reg,reg_state:uf,requested:true};toast("Pedido enviado para aprovação");render();
+}

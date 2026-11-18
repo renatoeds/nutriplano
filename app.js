@@ -181,7 +181,7 @@ function render(){
   $$("#tabs a").forEach(a=>a.classList.toggle("on",a.dataset.v===VIEW));
   $("#tabs").style.visibility=S.profile?"visible":"hidden";
   if(!S.profile&&S.pro&&VIEW==="alunos"){renderAlunos();setSync();window.scrollTo&&window.scrollTo(0,0);return}
-  if(!S.profile){$("#app").innerHTML=(S.pro?`<div class="card pro-onb"><b>Você está cadastrado como ${esc(PRO_KIND[S.pro.kind])}.</b> <span class="small muted">Para acompanhar seus alunos não precisa preencher nada.</span><a class="btn pri sm" href="#alunos">Ir para meus alunos</a></div>`:"")+onboardingHTML();bindProfileForm(true);const f=$("#impf");if(f)f.addEventListener("change",importFile);setSync();return}
+  if(!S.profile){$("#app").innerHTML=(S.pro?`<div class="card pro-onb"><b>Você está cadastrado como ${esc(PRO_KIND[S.pro.kind])}.</b> <span class="small muted">Para acompanhar seus alunos não precisa preencher nada.</span><a class="btn pri sm" href="#alunos">Ir para meus alunos</a></div>`:"")+(typeof proOnboardWrap==="function"&&!S.pro?proOnboardWrap(onboardingHTML()):onboardingHTML());bindProfileForm(true);const f=$("#impf");if(f)f.addEventListener("change",importFile);setSync();return}
   ({diario:renderDiario,treino:renderTreino,progresso:renderProgresso,corpo:renderCorpo,coach:renderCoach,alimentos:renderAlimentos,calculadora:renderCalc,relatorio:renderRelatorio,perfil:renderPerfil,alunos:()=>renderAlunos()})[VIEW]();
   setSync();window.scrollTo&&window.scrollTo(0,0);
 }
