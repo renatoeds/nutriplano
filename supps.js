@@ -11,7 +11,7 @@ const SP_CATALOG=[
  ["Performance",[["Creatina","g"],["Whey protein","scoop"],["Proteína vegetal","scoop"],["Caseína","scoop"],["Cafeína","mg"],["Beta-alanina","g"],["BCAA","g"],["Glutamina","g"],["L-carnitina","g"],["Citrulina","g"],["Pré-treino","dose"],["Termogênico","cápsula"],["Hipercalórico","scoop"],["Maltodextrina","g"]]],
  ["Outros",[["Ômega 3","softgel"],["Colágeno","g"],["Coenzima Q10","mg"],["Melatonina","mg"],["Probiótico","cápsula"],["Ashwagandha","mg"],["Spirulina","comprimido"],["Cúrcuma","cápsula"],["Fibras (psyllium)","g"]]]
 ];
-const SP_BRANDS=["Growth","Max Titanium","Integralmédica","Dux","Probiótica","Black Skull","Optimum Nutrition","Nutrify","Essential Nutrition","Vitafor","Puravida","Atlhetica","Darkness","Soldiers Nutrition","Sundown","Centrum","Lavitan","Nature's Bounty","Now Foods","Solgar","Catarinense","Equaliv","Vitgold","Sanavita","Herbalife","Farmácia de manipulação"];
+const SP_BRANDS=["Growth","Max Titanium","Integralmédica","Darkness","Dux","Probiótica","Black Skull","Optimum Nutrition","Nutrify","Essential Nutrition","Vitafor","Puravida","Atlhetica Nutrition","New Millen","Absolut Nutrition","Soldiers Nutrition","Ocean Drop","True Source","Rituária","EMS","Cimed","Lavitan","Eurofarma","Medley","Neo Química","Sundown","Centrum","Supradyn","Redoxon","Nature's Bounty","Now Foods","Solgar","Catarinense Pharma","Equaliv","Vitgold","Sanavita","Herbalife","Farmácia de manipulação"].sort((a,b)=>a.localeCompare(b,"pt-BR"));
 const SP_DEFAULT_MEAL={manha:"cafe",pre:"lanche2",pos:"lanche2",tarde:"lanche2",noite:"ceia",qualquer:"lanche1"};
 const SP_SUGGEST_OLD=["Creatina","Whey protein","Multivitamínico","Ômega 3","Vitamina D","Cafeína","Magnésio","Colágeno","Glutamina","Pré-treino","Vitamina C","Zinco","Melatonina"];
 function spList(){return ((S.profile&&S.profile.supps)||[]).map(spNorm)}
@@ -73,7 +73,7 @@ function suppEditorHTML(){
   const list=spList();
   return `<div class="card" style="margin-bottom:14px"><div class="row"><h2 style="margin:0">Minha suplementação</h2><span class="sp"></span><button class="btn sm pri" data-sp="new">${ic("plus",15)} Adicionar</button></div>
    <p class="small muted" style="margin:6px 0 4px">Aparece no Diário agrupada por horário. Ligue a um alimento (ex.: o seu whey) para as calorias entrarem sozinhas.</p>
-   ${list.length?list.map(sp=>{const st=spStock(sp);const f=spFood(sp);return `<div class="kv supp-row" data-sp="edit" data-id="${esc(sp.id)}" role="button" tabindex="0"><span><b>${esc(sp.name)}</b>${spBrand(sp)?` <span class="tag">${esc(spBrand(sp))}</span>`:""} <span class="small muted">· ${esc(spDoseLabel(sp))} · ${(SP_TIMES.find(t=>t[0]===sp.time)||[,""])[1]}${sp.days==="treino"?" · só treino":""}${f?" · lança em "+esc(mealName(sp.meal||SP_DEFAULT_MEAL[sp.time])):""}</span>${st?`<br><span class="tiny ${st.days!=null&&st.days<=10?"up":"muted"}">Estoque: ${nf(st.left,st.left%1?1:0)} ${esc(st.unit)} (~${st.doses} doses${st.days!=null?`, ${st.days} dias`:""})</span>`:""}</span><span class="muted">${ic("chevR",16)}</span></div>`}).join(""):`<div class="empty" style="padding-left:0">Nenhum suplemento cadastrado.</div>`}</div>`;
+   ${list.length?list.map(sp=>{const st=spStock(sp);const f=spFood(sp);return `<div class="kv supp-row" data-sp="edit" data-id="${esc(sp.id)}" role="button" tabindex="0"><span><b>${esc(sp.name)}</b>${spBrand(sp)?` <span class="tag">${esc(spBrand(sp))}</span>`:""}${sp.verified?` <span class="tag tag-ok">${ic("shieldok",12)} verificado</span>`:""} <span class="small muted">· ${esc(spDoseLabel(sp))} · ${(SP_TIMES.find(t=>t[0]===sp.time)||[,""])[1]}${sp.days==="treino"?" · só treino":""}${f?" · lança em "+esc(mealName(sp.meal||SP_DEFAULT_MEAL[sp.time])):""}</span>${st?`<br><span class="tiny ${st.days!=null&&st.days<=10?"up":"muted"}">Estoque: ${nf(st.left,st.left%1?1:0)} ${esc(st.unit)} (~${st.doses} doses${st.days!=null?`, ${st.days} dias`:""})</span>`:""}</span><span class="row" style="gap:4px;flex:none"><button class="iconbtn" data-sp="verify" data-id="${esc(sp.id)}" title="Verificar produto" aria-label="Verificar ${esc(sp.name)}">${ic(sp.verified?"shieldok":"shield",17)}</button><span class="muted">${ic("chevR",16)}</span></span></div>`}).join(""):`<div class="empty" style="padding-left:0">Nenhum suplemento cadastrado.</div>`}</div>`;
 }
 /* ---------- Progresso (constância) ---------- */
 function suppProgressHTML(days){
@@ -82,6 +82,47 @@ function suppProgressHTML(days){
     return `<div class="supp-pr"><div class="row" style="gap:8px"><b>${esc(spTitle(sp))}</b><span class="sp"></span><span class="num small">${a.tk}/${a.app} dias${pct!=null?` · <b>${pct}%</b>`:""}</span></div><div class="bar" style="margin-top:6px"><i style="width:${pct||0}%;background:${pct>=80?"var(--chart-trend,var(--accent))":pct>=50?"var(--c)":"var(--g)"}"></i></div>${st?`<div class="tiny muted" style="margin-top:4px">Estoque: ${nf(st.left,st.left%1?1:0)} ${esc(st.unit)}${st.days!=null?` · ~${st.days} dias`:""}</div>`:""}</div>`}).join("")}</div>
    <p class="tiny muted" style="margin-bottom:0">Conta os dias em que o suplemento valia (todos os dias, ou só os de treino) desde que foi cadastrado.</p></div>`;
 }
+/* ---------- verificação do produto ---------- */
+const SPV={};
+function spQ(t){return encodeURIComponent(t)}
+function spVerifyOpen(fromForm,id){
+  let sp;
+  if(fromForm){spReadForm();sp=SPF}else{sp=spList().find(x=>x.id===id);if(!sp)return;Object.assign(SPF,clone(sp))}
+  SPV.fromForm=fromForm;SPV.ai=null;showModal();spVerifyRender();
+}
+function spVerifyRender(){
+  const sp=SPF;const brand=sp.brand||spBrand(sp)||"";const prod=(sp.name||"").replace(/\s*\(.*?\)\s*/g," ").trim();const term=[brand,prod].filter(Boolean).join(" ");
+  const G=q=>`https://www.google.com/search?q=${spQ(q)}`;
+  const links=[
+    ["Consulta oficial da Anvisa","https://consultas.anvisa.gov.br/","Abra “Alimentos” e busque pelo nome, empresa ou nº de notificação. O produto deve aparecer como ativo."],
+    ["Alertas, proibições e recolhimentos",G(`${term} Anvisa resolução proíbe OR apreensão OR recolhimento`),"Notícias e resoluções da Anvisa sobre a marca ou o produto."],
+    ["Laudos de laboratório",G(`${term} laudo análise laboratório teor`),"Testes independentes (ex.: de associações). Veja a data e o lote — resultados já foram contestados por fabricantes."],
+    ["Reputação da empresa",G(`reclame aqui ${brand||prod}`),"Reclamações de clientes no Reclame Aqui (abra o perfil oficial da empresa)."],
+    ["Certificações internacionais",G(`${term} "Informed Sport" OR "NSF Certified" OR "USP Verified"`),"Selos de terceira parte (comuns em importados)."]
+  ];
+  const v=sp.verified;
+  $("#mbody").innerHTML=`<div class="mhead">${SPV.fromForm?`<button class="iconbtn" data-sp="verify-back" aria-label="Voltar">${ic("chevL")}</button>`:""}<h3>${ic("shield")} Verificar produto</h3><button class="iconbtn" data-act="close" aria-label="Fechar">${ic("x")}</button></div>
+  <div class="vf-head"><b>${esc(sp.name||"Suplemento")}</b>${brand?` <span class="tag">${esc(brand)}</span>`:""}${v?` <span class="tag tag-ok">${ic("shieldok",12)} conferido em ${short(v)}</span>`:""}</div>
+  <p class="small muted" style="margin:6px 0 12px">O Nutri Plano não avalia marcas: ele junta as fontes certas para você conferir. Em caso de dúvida, fale com seu nutricionista, médico ou farmacêutico.</p>
+  <h4 class="vf-h">No rótulo, confira</h4>
+  <ul class="vf-list"><li>A expressão <b>“SUPLEMENTO ALIMENTAR”</b> com a forma (cápsula, pó, líquido…).</li><li><b>Fabricante</b> identificado, com CNPJ e endereço.</li><li>Lote, validade e tabela nutricional legíveis.</li><li>Nada de promessa de cura, tratamento ou emagrecimento rápido — suplemento não é medicamento.</li><li>Preço muito abaixo do normal e vendedor desconhecido são sinais de alerta.</li></ul>
+  <h4 class="vf-h">Consultar fontes</h4>
+  <div class="vf-links">${links.map(([t,u,d])=>`<a class="vf-link" href="${esc(u)}" target="_blank" rel="noopener"><span><b>${t}</b><span>${d}</span></span>${ic("ext",16)}</a>`).join("")}</div>
+  ${S.ai?`<div class="vf-ai"><button class="btn sm" data-sp="verify-ai">${ic("sparkles",15)} Pesquisar na internet com IA</button><div id="vf-ai-out">${SPV.ai||""}</div></div>`:""}
+  <h4 class="vf-h">O que você conferiu</h4>
+  <div class="form"><label class="f">Nº de notificação/registro na Anvisa<input type="text" id="vf_anvisa" value="${esc(sp.anvisa||"")}" placeholder="como aparece no rótulo ou na consulta"></label>
+  <label class="switch small" style="align-self:end;padding-bottom:10px"><input type="checkbox" id="vf_ok" ${v?"checked":""}> Conferi: está regular e confio no produto</label></div>
+  <div class="row" style="margin-top:14px"><span class="sp"></span><button class="btn pri" data-sp="verify-save">${ic("check",15)} ${SPV.fromForm?"Voltar ao cadastro":"Salvar"}</button></div>`;
+}
+async function spVerifyAI(){
+  const out=$("#vf-ai-out");out.innerHTML=`<p class="small muted">Pesquisando fontes públicas…</p>`;
+  try{const r=await aiCall({action:"verify",product:SPF.name||"",brand:SPF.brand||spBrand(SPF)||""});
+    const src=(r.sources||[]).slice(0,8);
+    SPV.ai=`<div class="aiout" style="margin-top:8px">${mdLite(r.text||"")}</div>${src.length?`<div class="tiny muted" style="margin-top:6px">Fontes:</div><ul class="vf-src">${src.map(x=>`<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title||x.url)}</a></li>`).join("")}</ul>`:""}<p class="tiny muted">Resumo automático de fontes públicas — pode conter erros. Confira os links.</p>`;
+    out.innerHTML=SPV.ai;
+  }catch(e){out.innerHTML=`<p class="small" style="color:var(--g)">${e.code==="not_configured"?"A IA ainda não foi ativada.":"Não consegui pesquisar agora. Use os links acima."}</p>`}
+}
+
 /* ---------- formulário ---------- */
 const SPF={};
 function spOpen(id){
@@ -98,6 +139,7 @@ function spRender(){
    <datalist id="spf_sug">${SP_CATALOG.flatMap(g=>g[1]).map(x=>`<option value="${esc(x[0])}">`).join("")}</datalist>
    <label class="f">Marca (opcional)<input type="text" id="spf_brand" list="spf_brands" value="${esc(SPF.brand||"")}" placeholder="ex: Sundown, Growth, manipulado"></label>
    <datalist id="spf_brands">${SP_BRANDS.map(x=>`<option value="${esc(x)}">`).join("")}</datalist>
+   <div style="grid-column:1/-1"><button class="btn sm ${SPF.verified?"":"ghost"}" data-sp="verify-form" type="button">${ic(SPF.verified?"shieldok":"shield",15)} ${SPF.verified?"Verificado — ver detalhes":"Verificar produto (Anvisa, laudos, reclamações)"}</button></div>
    <details class="f spf-link" style="grid-column:1/-1" ${f?"open":""}><summary class="small">Ligar a um alimento do banco <span class="muted" style="font-weight:500">— opcional, para whey, barra, hipercalórico…</span></summary><div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
     ${f?`<div class="supp-link">${ic("check",15)} <span><b>${esc(f.name)}</b><br><span class="tiny muted">${nf(f.kcal)} kcal · P ${nf(f.p,1)} g por 100 g</span></span><button class="btn sm ghost" data-sp="unlink">Desligar</button></div>`
       :`<input type="search" id="spf_q" placeholder="Buscar — ex: whey growth, max titanium, creatina" autocomplete="off"><div id="spf_res" class="flist"></div>`}
@@ -122,6 +164,13 @@ function spReadForm(){
 document.addEventListener("click",e=>{
   const b=e.target.closest("[data-sp]");if(!b)return;const a=b.dataset.sp;
   if(a==="toggle"){spToggle(S.date,b.dataset.id);return}
+  if(a==="verify"){e.stopPropagation();spVerifyOpen(false,b.dataset.id);return}
+  if(a==="verify-form"){spVerifyOpen(true);return}
+  if(a==="verify-ai"){spVerifyAI();return}
+  if(a==="verify-back"){SPF.anvisa=$("#vf_anvisa").value.trim();SPF.verified=$("#vf_ok").checked?(SPF.verified||TODAY()):null;spRender();return}
+  if(a==="verify-save"){SPF.anvisa=$("#vf_anvisa").value.trim();SPF.verified=$("#vf_ok").checked?(SPF.verified||TODAY()):null;
+    if(SPV.fromForm){spRender();return}
+    const arr=S.profile.supps||[];const i=arr.findIndex(x=>x.id===SPF.id);if(i>=0){arr[i].anvisa=SPF.anvisa;arr[i].verified=SPF.verified;saveProfile()}closeModal();render();toast(SPF.verified?"Produto marcado como verificado":"Verificação salva");return}
   if(a==="new"){spOpen(null);return}
   if(a==="edit"){spOpen(b.dataset.id);return}
   if(a==="manage"){location.hash="#perfil";return}
@@ -130,7 +179,7 @@ document.addEventListener("click",e=>{
   if(a==="unlink"){spReadForm();SPF.fid=null;spRender();return}
   if(a==="del"){if(b.dataset.confirm!=="1"){b.dataset.confirm="1";b.textContent="Confirmar remoção";return}S.profile.supps=(S.profile.supps||[]).filter(x=>x.id!==SPF.id);saveProfile();closeModal();render();toast("Suplemento removido");return}
   if(a==="save"){spReadForm();if(!SPF.name){toast("Informe o nome");return}
-    const o={id:SPF.id||uid(),name:SPF.name,brand:SPF.brand||"",time:SPF.time,days:SPF.days,fid:SPF.fid||null,n:SPF.n,u:SPF.u,meal:SPF.fid?SPF.meal:null,amount:SPF.fid?null:SPF.amount,unit:SPF.fid?null:SPF.unit,pot:SPF.pot||null,refill:SPF.refill,created:(spList().find(x=>x.id===SPF.id)||{}).created||TODAY()};
+    const o={id:SPF.id||uid(),name:SPF.name,brand:SPF.brand||"",anvisa:SPF.anvisa||"",verified:SPF.verified||null,time:SPF.time,days:SPF.days,fid:SPF.fid||null,n:SPF.n,u:SPF.u,meal:SPF.fid?SPF.meal:null,amount:SPF.fid?null:SPF.amount,unit:SPF.fid?null:SPF.unit,pot:SPF.pot||null,refill:SPF.refill,created:(spList().find(x=>x.id===SPF.id)||{}).created||TODAY()};
     o.dose=spDoseLabel(o);
     const arr=S.profile.supps||[];const i=arr.findIndex(x=>x.id===o.id);if(i>=0)arr[i]=o;else arr.push(o);S.profile.supps=arr;saveProfile();closeModal();render();toast("Suplemento salvo");return}
 });
