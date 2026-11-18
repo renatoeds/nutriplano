@@ -318,7 +318,7 @@ function renderModal(){
 }
 function searchFoods(q,limit=40){
   q=norm(q);if(!q)return [];const words=q.split(/\s+/);
-  return allFoods().filter(f=>{const n=norm(f.name+" "+f.cat);return words.every(w=>n.includes(w))}).sort((a,b)=>{const an=norm(a.name).startsWith(q)?0:1,bn=norm(b.name).startsWith(q)?0:1;return an-bn||a.name.localeCompare(b.name)}).slice(0,limit);
+  return allFoods().filter(f=>{const n=norm(f.name+" "+f.cat+" "+((typeof FOOD_KW!=="undefined"&&FOOD_KW[f.id])||"")+" "+(f.portions||[]).map(x=>x[0]).join(" "));return words.every(w=>n.includes(w))}).sort((a,b)=>{const sc=f=>{const n=norm(f.name);return n.startsWith(q)?0:words.every(w=>n.includes(w))?1:2};return sc(a)-sc(b)||a.name.localeCompare(b.name)}).slice(0,limit);
 }
 function foodRow(f,act){return `<button class="fitem" data-act="${act}" data-fid="${esc(f.id)}"><div class="nm"><div>${esc(f.name)} ${f.recipe?'<span class="tag">receita</span>':f.ai?'<span class="tag ai">IA</span>':f.custom?'<span class="tag">meu</span>':""}</div><div class="tiny muted">${nf(f.kcal)} kcal · P ${nf(f.p,1)} · C ${nf(f.c,1)} · G ${nf(f.g,1)} por 100 g</div></div><span class="muted">${ic("chevR",16)}</span></button>`}
 function renderResults(){

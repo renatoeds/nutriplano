@@ -9,6 +9,9 @@ const FOODS_RAW = [
 ["pao-forma","Pão de forma tradicional","Cereais e pães",253,12.0,44.1,2.7,2.3,[["fatia",25]]],
 ["pao-integral","Pão de forma integral","Cereais e pães",253,9.4,49.9,3.7,6.9,[["fatia",25]]],
 ["pao-queijo","Pão de queijo assado","Cereais e pães",363,5.1,34.2,24.6,0.6,[["unidade média",40],["unidade pequena",20]]],
+["rap10","Rap10 tradicional (tortilha)","Cereais e pães",300,8.0,50.0,7.5,0,[["unidade",40]]],
+["rap10-integral","Rap10 integral (tortilha)","Cereais e pães",302,7.3,42.5,7.8,0,[["unidade",40]]],
+["rap10-fit","Rap10 Fit (tortilha)","Cereais e pães",243,7.3,47.5,2.5,0,[["unidade",40]]],
 ["tapioca","Tapioca (goma hidratada)","Cereais e pães",240,0.1,59.0,0.1,0.6,[["tapioca média",50],["colher de sopa",20]]],
 ["cuscuz","Cuscuz de milho cozido","Cereais e pães",113,2.2,25.3,0.7,2.1,[["fatia/porção",100]]],
 ["aveia","Aveia em flocos","Cereais e pães",394,13.9,66.6,8.5,9.1,[["colher de sopa",15]]],
@@ -37,9 +40,32 @@ const FOODS_RAW = [
 ["frango-coxa","Coxa de frango assada com pele","Carnes e ovos",215,28.5,0.1,10.4,0,[["unidade",90]]],
 ["patinho","Patinho grelhado","Carnes e ovos",219,35.9,0.0,7.3,0,[["bife médio",100]]],
 ["carne-moida","Carne moída (acém) cozida","Carnes e ovos",212,26.7,0.0,10.9,0,[["colher de sopa",25]]],
-["alcatra","Alcatra grelhada","Carnes e ovos",241,31.9,0.0,11.6,0,[["bife médio",100]]],
+["alcatra","Alcatra / miolo de alcatra grelhado","Carnes e ovos",241,31.9,0.0,11.6,0,[["bife médio",100]]],
 ["picanha","Picanha grelhada com gordura","Carnes e ovos",289,26.4,0.0,19.5,0,[["fatia",80]]],
 ["figado","Fígado bovino grelhado","Carnes e ovos",225,29.9,4.2,9.0,0,[["bife",100]]],
+["contrafile","Contrafilé grelhado sem gordura","Carnes e ovos",194,35.9,0.0,4.5,0,[["bife médio",100]]],
+["contrafile-g","Contrafilé grelhado com gordura","Carnes e ovos",278,32.4,0.0,15.5,0,[["bife médio",100]]],
+["file-mignon","Filé mignon grelhado","Carnes e ovos",220,32.8,0.0,8.8,0,[["bife médio",100],["medalhão",120]]],
+["maminha","Maminha grelhada","Carnes e ovos",153,30.7,0.0,2.4,0,[["bife médio",100],["fatia",80]]],
+["picanha-sg","Picanha grelhada sem gordura","Carnes e ovos",238,31.9,0.0,11.3,0,[["fatia",80]]],
+["fraldinha","Fraldinha cozida (com gordura)","Carnes e ovos",338,24.2,0.0,26.0,0,[["fatia",80]]],
+["coxao-mole","Coxão mole cozido (chã de dentro)","Carnes e ovos",219,32.4,0.0,8.9,0,[["bife médio",100],["colher de servir",80]]],
+["coxao-duro","Coxão duro cozido","Carnes e ovos",217,31.9,0.0,8.9,0,[["bife médio",100]]],
+["lagarto","Lagarto cozido","Carnes e ovos",222,32.9,0.0,9.1,0,[["fatia",80]]],
+["acem","Acém cozido (carne de panela)","Carnes e ovos",215,27.3,0.0,10.9,0,[["colher de servir",80],["pedaço",100]]],
+["musculo","Músculo cozido","Carnes e ovos",194,31.2,0.0,6.7,0,[["colher de servir",80],["pedaço",100]]],
+["paleta","Paleta cozida","Carnes e ovos",194,29.7,0.0,7.4,0,[["pedaço",100]]],
+["cupim","Cupim assado","Carnes e ovos",330,28.6,0.0,23.0,0,[["fatia",80]]],
+["costela-boi","Costela bovina assada","Carnes e ovos",373,28.8,0.0,27.7,0,[["pedaço",100]]],
+["carne-sol","Carne de sol / carne seca cozida","Carnes e ovos",313,26.9,0.0,21.9,0,[["colher de servir",80]]],
+["charque","Charque cozido","Carnes e ovos",263,36.4,0.0,11.9,0,[["colher de servir",80]]],
+["bife-milanesa","Bife à milanesa (contrafilé)","Carnes e ovos",352,20.6,12.2,24.0,0,[["bife médio",120]]],
+["hamburguer","Hambúrguer bovino grelhado","Carnes e ovos",210,13.2,11.3,12.4,0,[["unidade",56]]],
+["frango-sobrecoxa","Sobrecoxa de frango assada sem pele","Carnes e ovos",233,29.2,0.0,12.0,0,[["unidade",100]]],
+["frango-asa","Asa de frango assada com pele","Carnes e ovos",213,18.1,0.0,15.1,0,[["unidade",40]]],
+["frango-coracao","Coração de frango grelhado","Carnes e ovos",207,22.4,0.6,12.1,0,[["espetinho",80],["unidade",8]]],
+["pernil","Pernil suíno assado","Carnes e ovos",262,32.1,0.0,13.9,0,[["fatia",80]]],
+["costela-porco","Costela suína assada","Carnes e ovos",402,30.2,0.0,30.3,0,[["pedaço",100]]],
 ["bisteca","Bisteca suína grelhada","Carnes e ovos",280,28.9,0.0,17.4,0,[["unidade",100]]],
 ["lombo","Lombo suíno assado","Carnes e ovos",210,35.7,0.0,6.4,0,[["fatia",80]]],
 ["linguica","Linguiça de porco grelhada","Carnes e ovos",296,23.2,0.0,21.9,0,[["gomo",60]]],
@@ -170,6 +196,13 @@ const SUPPS_RAW=[
 ];
 SUPPS_RAW.forEach(a=>{const f=100/a[3];FOODS_RAW.push([a[0],a[1],a[0].match(/creatina|glutamina|colageno|bcaa|pre-treino|barra/)?"Suplementos — outros":"Suplementos — whey e proteínas",r1x(a[4]*f),r1x(a[5]*f),r1x(a[6]*f),r1x(a[7]*f),r1x(a[8]*f),[[a[2],a[3]]]])});
 function r1x(n){return Math.round(n*10)/10}
+/* palavras extras para a busca (não aparecem na tela) */
+const FOOD_KW={};
+"patinho carne-moida alcatra picanha picanha-sg figado contrafile contrafile-g file-mignon maminha fraldinha coxao-mole coxao-duro lagarto acem musculo paleta cupim costela-boi carne-sol charque bife-milanesa hamburguer".split(" ").forEach(id=>FOOD_KW[id]="carne bovina boi vermelha");
+"contrafile contrafile-g file-mignon maminha alcatra patinho coxao-mole picanha".split(" ").forEach(id=>FOOD_KW[id]+=" bife");
+FOOD_KW.contrafile+=" contra file";FOOD_KW["contrafile-g"]+=" contra file";FOOD_KW["file-mignon"]+=" filet mingnon";FOOD_KW["carne-sol"]+=" sertao jaba";FOOD_KW["coxao-mole"]+=" polpa";
+"bisteca lombo pernil costela-porco linguica".split(" ").forEach(id=>FOOD_KW[id]="carne porco suina");
+"rap10 rap10-integral rap10-fit".split(" ").forEach(id=>FOOD_KW[id]="rap 10 wrap tortilla tortilha pullman bimbo");
 const FOODS = FOODS_RAW.map(a=>({id:a[0],name:a[1],cat:a[2],kcal:a[3],p:a[4],c:a[5],g:a[6],fib:a[7],portions:a[8]||[]}));
 
 const MEALS=[["cafe","Café da manhã"],["lanche1","Lanche da manhã"],["almoco","Almoço"],["lanche2","Lanche da tarde"],["jantar","Jantar"],["ceia","Ceia"]];
