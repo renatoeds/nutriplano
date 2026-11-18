@@ -10,7 +10,7 @@ const FOODS_RAW = [
 ["pao-integral","Pão de forma integral","Cereais e pães",253,9.4,49.9,3.7,6.9,[["fatia",25]]],
 ["pao-queijo","Pão de queijo assado","Cereais e pães",363,5.1,34.2,24.6,0.6,[["unidade média",40],["unidade pequena",20]]],
 ["rap10","Rap10 tradicional (tortilha)","Cereais e pães",300,8.0,50.0,7.5,0,[["unidade",40]]],
-["rap10-integral","Rap10 integral (tortilha)","Cereais e pães",302,7.3,42.5,7.8,0,[["unidade",40]]],
+["rap10-integral","Rap10 integral (tortilha)","Cereais e pães",290,8.5,42.5,8.0,6.3,[["unidade",40]]],
 ["rap10-fit","Rap10 Fit (tortilha)","Cereais e pães",243,7.3,47.5,2.5,0,[["unidade",40]]],
 ["tapioca","Tapioca (goma hidratada)","Cereais e pães",240,0.1,59.0,0.1,0.6,[["tapioca média",50],["colher de sopa",20]]],
 ["cuscuz","Cuscuz de milho cozido","Cereais e pães",113,2.2,25.3,0.7,2.1,[["fatia/porção",100]]],
