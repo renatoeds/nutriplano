@@ -271,7 +271,7 @@ function renderDiario(){
   const meals=MEALS.map(([k,name])=>{
     const items=day.meals[k]||[];const s=sumItems(items);const canCopy=prevDay&&prevDay.meals&&(prevDay.meals[k]||[]).length;
     return `<div class="card meal meal-${k}"><div class="meal-h"><span class="meal-ic" aria-hidden="true">${ic("m_"+k,20)}</span><h3>${name}</h3><span class="kc num">${nf(s.kcal)} kcal</span>${items.length?pcg(s):""}<span class="sp"></span><button class="btn sm pri meal-add" data-act="add" data-meal="${k}" aria-label="Adicionar em ${name}" title="Adicionar em ${name}">${ic("plus",15)} Adicionar</button></div>
-      ${items.length?`<ul class="items">${items.map((i,ix)=>`<li data-act="edit" data-meal="${k}" data-ix="${ix}"><div class="nm"><div>${esc(i.name)}</div><div class="q">${esc(itemQty(i))}</div></div>${pcg(i)}<span class="kc num">${nf(i.kcal)} kcal</span><button class="iconbtn" data-act="del" data-meal="${k}" data-ix="${ix}" title="Remover">${ic("x",16)}</button></li>`).join("")}</ul>`:`<div class="empty">Nada registrado.</div>`}
+      ${items.length?`<ul class="items">${items.map((i,ix)=>`<li data-act="edit" data-meal="${k}" data-ix="${ix}"><div class="nm"><div>${esc(i.name)}${i.sid?' <span class="tag">suplemento</span>':""}</div><div class="q">${esc(itemQty(i))}</div></div>${pcg(i)}<span class="kc num">${nf(i.kcal)} kcal</span><button class="iconbtn" data-act="del" data-meal="${k}" data-ix="${ix}" title="Remover">${ic("x",16)}</button></li>`).join("")}</ul>`:`<div class="empty">Nada registrado.</div>`}
       ${canCopy||items.length?`<div class="meal-f">${canCopy?`<button class="btn sm ghost" data-act="copymeal" data-meal="${k}">${ic("repeat",15)} Repetir de ${d===TODAY()?"ontem":short(prev)} (${nf(sumItems(prevDay.meals[k]).kcal)} kcal)</button>`:""}${items.length?`<button class="btn sm ghost" data-act="savemeal" data-meal="${k}">${ic("star",15)} Salvar esta refeição</button>`:""}</div>`:""}</div>`;}).join("");
   $("#app").innerHTML=`${dayBar()}${banner}
   <div class="grid g2" style="margin-bottom:14px">
@@ -284,10 +284,10 @@ function renderDiario(){
       <div class="kv"><span>Peso de hoje (kg)</span><input type="number" step="0.1" min="20" max="400" id="wInput" value="${day.weight||""}" placeholder="ex: 78,4" style="width:110px;text-align:right"></div>
       <div class="kv" style="display:block"><div class="row"><span>Água</span><span class="sp"></span><span class="num small"><b>${nf((day.water||0)/1000,2)}</b> / ${nf(waterT/1000,1)} L</span><button class="btn sm" data-act="water" data-n="-250">−</button><button class="btn sm" data-act="water" data-n="250">${ic("droplet",15)} + 250 ml</button></div><div class="water">${Array.from({length:cups},(_,i)=>`<i class="${i<have?"on":""}"></i>`).join("")}</div></div>
       <div class="kv"><span>Treino do dia</span><a href="#treino" class="small">${(day.workouts||[]).length?`${day.workouts.length} atividade(s) · ~${nf(ex)} kcal`:"Registrar treino →"}</a></div>
-      ${(p.supps||[]).length?`<div class="kv" style="display:block"><div class="row"><span>Suplementos do dia</span><span class="sp"></span><a href="#perfil" class="tiny">editar</a></div><div class="chips" style="margin-top:6px">${p.supps.map(sp=>`<button class="chip ${(day.supps||{})[sp.id]?"on":""}" data-act="suppck" data-id="${esc(sp.id)}">${(day.supps||{})[sp.id]?ic("check",14)+" ":""}${esc(sp.name)}${sp.dose?` · ${esc(sp.dose)}`:""}</button>`).join("")}</div></div>`:`<div class="kv"><span>Suplementos do dia</span><a href="#perfil" class="small">Configurar rotina →</a></div>`}
       <div class="kv"><span>Sequência de registros</span><b class="num">${st} dia${st===1?"":"s"}</b></div>
       <label class="switch tiny muted" style="margin-top:8px"><input type="checkbox" id="incInput" ${day.incomplete?"checked":""}> Registro incompleto (não usar este dia no ajuste da dieta)</label>
     </div></div>
+  ${suppCardHTML(d)}
   <div class="grid">${meals}</div>
   <div class="card" style="margin-top:14px"><label class="f">Anotações do dia<textarea id="noteInput" rows="2" placeholder="Fome, sono, humor, eventos…">${esc(day.note||"")}</textarea></label>
   <div class="row" style="margin-top:10px"><span class="tiny muted" id="saveHint">Tudo é salvo automaticamente enquanto você usa.</span><span class="sp"></span><button class="btn pri" data-act="saveall">${ic("save")} Salvar dia</button></div></div>`;
@@ -327,7 +327,7 @@ function renderResults(){
   $("#fresults").innerHTML=(!q?`<div class="tiny muted" style="margin:4px 8px">${(S.profile.recent||[]).length?"Usados recentemente":"Sugestões"}</div>`:"")+
   (list.length?list.map(f=>foodRow(f,"pick")).join(""):`<div class="empty">Nenhum alimento encontrado para “${esc(M.q)}”. Use “Criar alimento”${S.ai?" ou “Estimar com IA”":""}.</div>`);
 }
-function unitsFor(f){return [["g",1,"gramas (g) / ml"]].concat((f.portions||[]).map(([l,g],i)=>["p"+i,g,`${l} (${nf(g,g%1?1:0)} g)`]))}
+function unitsFor(f){return [["g",1,"gramas (g) / ml"]].concat((f.portions||[]).map(([l,g],i)=>["p"+i,g,/\d\s*g\)?\s*$/.test(l)?l:`${l} (${nf(g,g%1?1:0)} g)`]))}
 function calcItem(f,n,u){
   const units=unitsFor(f);const un=units.find(x=>x[0]===u)||units[0];const q=n*un[1];const k=q/100;
   return {fid:f.id,name:f.name,n,u:un[0],ul:un[0]==="g"?"g":(f.portions[+un[0].slice(1)]||[""])[0],q:r1(q),kcal:r0(f.kcal*k),p:r1(f.p*k),c:r1(f.c*k),g:r1(f.g*k),fib:r1(f.fib*k)};
@@ -355,6 +355,7 @@ function pushRecent(fid){if(!fid)return;const p=S.profile;p.recent=[fid].concat(
 function confirmQty(){
   const it=M.cur;if(!it||!(it.n>0)){toast("Informe a quantidade");return}
   const d=S.date,day=getDay(d,true);
+  if(M.edit&&M.edit.item.sid)it.sid=M.edit.item.sid;
   if(M.edit)day.meals[M.edit.meal][M.edit.ix]=it;else day.meals[M.meal].push(it);
   saveDay(d);pushRecent(it.fid);saveProfile();toast(`${it.name}: ${nf(it.kcal)} kcal ${M.edit?"atualizado":"adicionado"}`);closeModal();render();
 }
@@ -580,6 +581,7 @@ function renderProgresso(){
     <div class="tile"><div class="t">Proteína média</div><div class="v num">${avg("p")!=null?nf(avg("p"))+" g":"—"}</div><div class="s">meta ${nf(P.targets.p)} g/dia</div></div>
     <div class="tile"><div class="t">Aderência</div><div class="v num">${logged.length?nf(within/logged.length*100)+"%":"—"}</div><div class="s">${logged.length}/${days.length} dias · ${trainings} treinos${km?` · ${nf(km,1)} km`:""}</div></div>
   </div>
+  ${suppProgressHTML(days)}
   <div class="card" style="margin-bottom:14px"><div class="row"><h2 style="margin:0">Relatório semanal com IA</h2><span class="sp"></span>${S.ai?`<button class="btn pri sm" data-act="aireport">${ic("sparkles",15)} Gerar relatório da semana</button>`:`<span class="tiny muted">IA desativada — veja em Perfil como ativar</span>`}</div>
     <div class="aiout" id="aiout">${lastRep?`<div class="tiny muted" style="margin-top:6px">Gerado em ${short(lastRep.date)}</div>${mdLite(lastRep.text)}`:`<p class="small muted" style="margin-bottom:0">Um resumo do que funcionou, onde a proteína ou as calorias ficaram fora e sugestões para a próxima semana.</p>`}</div></div>
   <div class="grid g2" style="grid-template-columns:1fr 1fr;margin-bottom:14px">
@@ -597,7 +599,7 @@ async function aiReport(){
   const out=$("#aiout");out.innerHTML=`<p class="small muted">Analisando sua semana…</p>`;
   const days=rangeDays(7);const P=S.profile;const ser=weightSeries();const tmap={};ser.forEach(x=>tmap[x.d]=x.t);
   const data={objetivo:GOALS[P.goal].label,ritmo_pct_semana:P.rate,metas:P.targets,peso_meta:P.goalWeight||null,
-    dias:days.map(d=>{const t=dayTotals(d),day=S.days[d]||{};return {data:d,registrou:isLogged(d),kcal:r0(t.kcal),proteina:r0(t.p),carbo:r0(t.c),gordura:r0(t.g),fibra:r0(t.fib),meta_kcal:dayTarget(d).kcal,peso_balanca:day.weight||null,peso_tendencia:tmap[d]!=null?r1(tmap[d]):null,agua_ml:day.water||0,
+    dias:days.map(d=>{const t=dayTotals(d),day=S.days[d]||{};return {data:d,registrou:isLogged(d),kcal:r0(t.kcal),proteina:r0(t.p),carbo:r0(t.c),gordura:r0(t.g),fibra:r0(t.fib),meta_kcal:dayTarget(d).kcal,peso_balanca:day.weight||null,peso_tendencia:tmap[d]!=null?r1(tmap[d]):null,agua_ml:day.water||0,suplementos:(typeof spList==="function"?spList().filter(sp=>day.supps&&day.supps[sp.id]).map(sp=>sp.name):[]),
       treino:(day.workouts||[]).map(x=>x.type==="cardio"?`${(CARDIO.find(c=>c[0]===x.ctype)||[,"cardio"])[1]} ${x.min||"?"}min${x.km?" "+x.km+"km":""} ${cardioKcal(x)}kcal`:`${x.name}: ${setsTxt((x.sets||[]).filter(s=>s.r>0))}`),anotacao:day.note||""}})};
   try{const r=await aiCall({action:"report",data});P.reports=[{date:TODAY(),text:r.text}].concat(P.reports||[]).slice(0,10);saveProfile();out.innerHTML=`<div class="tiny muted" style="margin-top:6px">Gerado agora</div>${mdLite(r.text)}`}
   catch(e){out.innerHTML=`<p class="small" style="color:var(--g)">${e.code==="not_configured"?"A IA ainda não foi ativada.":"Não consegui gerar agora. Tente de novo em instantes."}</p>`}
@@ -765,9 +767,9 @@ function csvDownload(name,rows){
 const dec=n=>n==null||n===""?"":String(r1(n)).replace(".",",");
 function exportCSV(kind){
   const days=rangeDays(REP_N);let rows;
-  if(kind==="days"){rows=[["Data","kcal","Meta kcal","Proteína (g)","Carboidrato (g)","Gordura (g)","Fibra (g)","Água (L)","Peso (kg)","Peso tendência (kg)","Treino","Gasto treino (kcal)","Anotação"]];
+  if(kind==="days"){rows=[["Data","kcal","Meta kcal","Proteína (g)","Carboidrato (g)","Gordura (g)","Fibra (g)","Água (L)","Peso (kg)","Peso tendência (kg)","Treino","Gasto treino (kcal)","Suplementos","Anotação"]];
     const ser=weightSeries();const tmap={};ser.forEach(x=>tmap[x.d]=x.t);
-    days.forEach(d=>{const t=dayTotals(d),day=S.days[d]||{};rows.push([d,r0(t.kcal),dayTarget(d).kcal,dec(t.p),dec(t.c),dec(t.g),dec(t.fib),dec((day.water||0)/1000),dec(day.weight),dec(tmap[d]),workoutTxt(day),exKcal(d)||"",day.note||""])})}
+    days.forEach(d=>{const t=dayTotals(d),day=S.days[d]||{};rows.push([d,r0(t.kcal),dayTarget(d).kcal,dec(t.p),dec(t.c),dec(t.g),dec(t.fib),dec((day.water||0)/1000),dec(day.weight),dec(tmap[d]),workoutTxt(day),exKcal(d)||"",(typeof spList==="function"?spList().filter(sp=>day.supps&&day.supps[sp.id]).map(sp=>sp.name).join(", "):""),day.note||""])})}
   if(kind==="foods"){rows=[["Data","Refeição","Alimento","Quantidade","Gramas","kcal","Proteína (g)","Carboidrato (g)","Gordura (g)","Fibra (g)"]];
     days.forEach(d=>{const day=S.days[d];if(!day||!day.meals)return;MEALS.forEach(([k,n])=>(day.meals[k]||[]).forEach(i=>rows.push([d,n,i.name,itemQty(i),dec(i.q),r0(i.kcal),dec(i.p),dec(i.c),dec(i.g),dec(i.fib)])))})}
   if(kind==="train"){rows=[["Data","Treino","Tipo","Atividade","Séries (reps×kg)","Duração (min)","Distância (km)","Ritmo","Calorias"]];
@@ -832,10 +834,7 @@ function renderPerfil(){
     <div class="small" id="cy_prev" style="margin-top:8px"></div><div class="row" style="margin-top:10px"><span class="sp"></span><button class="btn" data-act="cysave">Salvar ciclo</button></div></div>
    <div class="card"><h2>Inteligência artificial</h2>${S.ai?`<p class="small" style="margin:0;display:flex;gap:8px;align-items:center"><span style="color:var(--accent)">${ic("check")}</span> Ativada — foto do prato, estimativa de alimentos e relatório semanal disponíveis.</p>`:`<p class="small" style="margin-top:0">Desativada. Para ativar: no painel do Supabase, abra o projeto <b>nutriplano</b> → <b>Edge Functions → Secrets</b> e crie <code>OPENAI_API_KEY</code> com a sua chave da OpenAI. Depois é só recarregar o app.</p>`}</div>
   </div><div>
-   <div class="card" style="margin-bottom:14px"><h2>Meus suplementos diários</h2><p class="small muted" style="margin-top:0">Aparecem como checklist no Diário. Para contar calorias (ex: whey), lance no Diário como alimento.</p>
-    ${(P.supps||[]).map(sp=>`<div class="kv"><span>${esc(sp.name)} ${sp.dose?`<span class="muted small">· ${esc(sp.dose)}</span>`:""}</span><button class="iconbtn" data-act="suppdel" data-id="${esc(sp.id)}">${ic("x",16)}</button></div>`).join("")}
-    <div class="row" style="margin-top:8px;flex-wrap:nowrap"><input type="text" id="sp_name" list="spl" placeholder="ex: Creatina"><input type="text" id="sp_dose" placeholder="dose, ex: 5 g" style="max-width:120px"><button class="btn sm pri" data-act="suppadd" aria-label="Adicionar">${ic("plus",16)}</button></div>
-    <datalist id="spl">${["Creatina","Whey protein","Multivitamínico","Ômega 3","Vitamina D","Cafeína","Magnésio","Colágeno","Glutamina","Pré-treino"].map(x=>`<option value="${x}">`).join("")}</datalist></div>
+   ${suppEditorHTML()}
    ${S.admin?`<div class="card" style="margin-bottom:14px"><h2>Quem pode acessar (admin)</h2><p class="small muted" style="margin-top:0">Só estes e-mails conseguem criar acesso. Depois de incluir, a pessoa entra em “Primeiro acesso” e cria a senha. Cada um vê só os próprios dados.</p>
     <div id="acl"><div class="small muted">Carregando…</div></div>
     <div class="row" style="margin-top:8px;flex-wrap:nowrap"><input type="text" id="acl_email" placeholder="email@exemplo.com" inputmode="email"><input type="text" id="acl_note" placeholder="nome (opcional)" style="max-width:150px"><button class="btn sm pri" data-act="acladd">Liberar</button></div>

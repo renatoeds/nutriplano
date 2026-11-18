@@ -37,6 +37,7 @@ const ICONS={
   m_lanche2:'<path d="M3.5 10.5L12 4.5l8.5 6z"/><path d="M4 13.5c1.6 0 1.6 1.2 3.2 1.2s1.6-1.2 3.2-1.2 1.6 1.2 3.2 1.2 1.6-1.2 3.2-1.2 1.6 1.2 3.2 1.2"/><path d="M3.5 17h17v1.5a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5z"/>',
   m_jantar:'<circle cx="12.5" cy="12" r="6"/><circle cx="12.5" cy="12" r="2.8"/><path d="M3 3.5v5a1.5 1.5 0 0 0 1.5 1.5v10.5M6 3.5v5A1.5 1.5 0 0 1 4.5 10M21.5 3.5c-1.3 0-2.2 1.7-2.2 4.4 0 1.8.9 2.9 2.2 2.9v9.7"/>',
   m_ceia:'<path d="M18.5 14.5A7.5 7.5 0 1 1 9.5 4.5a6 6 0 0 0 9 10z"/><path d="M17.5 3.5l.6 1.6 1.6.6-1.6.6-.6 1.6-.6-1.6-1.6-.6 1.6-.6z"/>',
+  pill:'<path d="M10.2 3.8a5.6 5.6 0 0 1 7.9 7.9l-6.4 6.4a5.6 5.6 0 0 1-7.9-7.9z"/><path d="M7 7l10 10" transform="translate(0 0)"/>',
   droplet:'<path d="M12 2.8s-6.5 7.2-6.5 11.7a6.5 6.5 0 0 0 13 0C18.5 10 12 2.8 12 2.8z"/>'
 };
 function ic(name,size){const s=size?` width="${size}" height="${size}"`:"";return `<svg class="ic ic-${name}" viewBox="0 0 24 24"${s} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICONS[name]||""}</svg>`}
