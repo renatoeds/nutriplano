@@ -186,7 +186,7 @@ function render(){
 function dayBar(){
   const d=S.date,isT=d===TODAY();
   const lbl=isT?"Hoje":d===addDays(TODAY(),-1)?"Ontem":fmtDate(d,{weekday:"short",day:"numeric",month:"short"});
-  return `<div class="daybar"><button class="btn sm" data-act="day" data-n="-1" aria-label="Dia anterior">‹</button><span class="dl">${esc(lbl)}</span><button class="btn sm" data-act="day" data-n="1" aria-label="Próximo dia">›</button><input type="date" id="dpick" value="${d}" max="${addDays(TODAY(),30)}">${isT?"":`<button class="btn sm ghost" data-act="today">Ir para hoje</button>`}</div>`;
+  return `<div class="daybar"><button class="btn sm" data-act="day" data-n="-1" aria-label="Dia anterior">${ic("chevL")}</button><span class="dl">${esc(lbl)}</span><button class="btn sm" data-act="day" data-n="1" aria-label="Próximo dia">${ic("chevR")}</button><input type="date" id="dpick" value="${d}" max="${addDays(TODAY(),30)}">${isT?"":`<button class="btn sm ghost" data-act="today">Ir para hoje</button>`}</div>`;
 }
 function bindDayPicker(){const dp=$("#dpick");if(dp)dp.addEventListener("change",e=>{if(e.target.value){S.date=e.target.value;render()}})}
 
@@ -204,8 +204,8 @@ function renderAuth(){
     <button class="btn pri" style="width:100%;justify-content:center;margin-top:14px" data-act="au_signup">Criar acesso</button><div style="margin-top:12px"><button class="linkbtn" data-act="au_mode" data-m="login">‹ Voltar para entrar</button></div>`;
   if(m==="forgot")body=`<label class="f">E-mail<input type="text" id="au_email" autocomplete="email" inputmode="email"></label><button class="btn pri" style="width:100%;justify-content:center;margin-top:14px" data-act="au_forgot">Enviar link de recuperação</button><div style="margin-top:12px"><button class="linkbtn" data-act="au_mode" data-m="login">‹ Voltar</button></div>`;
   if(m==="recovery")body=`<label class="f">Nova senha (mín. 8 caracteres)<input type="password" id="au_pass" autocomplete="new-password"></label><button class="btn pri" style="width:100%;justify-content:center;margin-top:14px" data-act="au_newpass">Salvar nova senha</button>`;
-  if(m==="denied")body=`<p class="small">O e-mail <b>${esc(S.user&&S.user.email||"")}</b> não está na lista de acesso do NutriPlano. Peça ao administrador para liberar.</p><button class="btn" data-act="logout">Sair</button>`;
-  $("#app").innerHTML=`<div class="auth"><div style="text-align:center;margin-bottom:16px"><div class="brand" style="justify-content:center;font-size:22px"><span class="brand-dot">N</span>NutriPlano</div><div class="small muted" style="margin-top:4px">Dieta, treino e progresso — acesso restrito</div></div>
+  if(m==="denied")body=`<p class="small">O e-mail <b>${esc(S.user&&S.user.email||"")}</b> não está na lista de acesso do Nutri Plano. Peça ao administrador para liberar.</p><button class="btn" data-act="logout">Sair</button>`;
+  $("#app").innerHTML=`<div class="auth"><div class="auth-brand">${brandLockup("brand-lg")}<div class="small muted" style="margin-top:10px">Dieta, treino e evolução — acesso restrito</div></div>
   <div class="card"><h1>${title}</h1>${body}<div class="err" id="au_err">${esc(AUTH.msg)}</div>${AUTH.ok?`<div class="ok">${esc(AUTH.ok)}</div>`:""}</div></div>`;
   const pw=$("#au_pass");if(pw)pw.addEventListener("keydown",e=>{if(e.key==="Enter"){const b=$(".auth .btn.pri");b&&b.click()}});
   const em=$("#au_email");if(em&&!em.value)em.focus();
@@ -269,9 +269,9 @@ function renderDiario(){
   const cyc=p.cycle&&p.cycle.on;
   const meals=MEALS.map(([k,name])=>{
     const items=day.meals[k]||[];const s=sumItems(items);const canCopy=prevDay&&prevDay.meals&&(prevDay.meals[k]||[]).length;
-    return `<div class="card meal"><div class="meal-h"><h3>${name}</h3><span class="kc num">${nf(s.kcal)} kcal</span>${items.length?pcg(s):""}<span class="sp"></span><button class="btn sm pri" data-act="add" data-meal="${k}">+ Adicionar</button></div>
-      ${items.length?`<ul class="items">${items.map((i,ix)=>`<li data-act="edit" data-meal="${k}" data-ix="${ix}"><div class="nm"><div>${esc(i.name)}</div><div class="q">${esc(itemQty(i))}</div></div>${pcg(i)}<span class="kc num">${nf(i.kcal)} kcal</span><button class="iconbtn" data-act="del" data-meal="${k}" data-ix="${ix}" title="Remover">✕</button></li>`).join("")}</ul>`:`<div class="empty">Nada registrado.</div>`}
-      ${canCopy||items.length?`<div class="meal-f">${canCopy?`<button class="btn sm ghost" data-act="copymeal" data-meal="${k}">↻ Repetir de ${d===TODAY()?"ontem":short(prev)} (${nf(sumItems(prevDay.meals[k]).kcal)} kcal)</button>`:""}${items.length?`<button class="btn sm ghost" data-act="savemeal" data-meal="${k}">☆ Salvar esta refeição</button>`:""}</div>`:""}</div>`;}).join("");
+    return `<div class="card meal"><div class="meal-h"><h3>${name}</h3><span class="kc num">${nf(s.kcal)} kcal</span>${items.length?pcg(s):""}<span class="sp"></span><button class="btn sm pri" data-act="add" data-meal="${k}">${ic("plus",15)} Adicionar</button></div>
+      ${items.length?`<ul class="items">${items.map((i,ix)=>`<li data-act="edit" data-meal="${k}" data-ix="${ix}"><div class="nm"><div>${esc(i.name)}</div><div class="q">${esc(itemQty(i))}</div></div>${pcg(i)}<span class="kc num">${nf(i.kcal)} kcal</span><button class="iconbtn" data-act="del" data-meal="${k}" data-ix="${ix}" title="Remover">${ic("x",16)}</button></li>`).join("")}</ul>`:`<div class="empty">Nada registrado.</div>`}
+      ${canCopy||items.length?`<div class="meal-f">${canCopy?`<button class="btn sm ghost" data-act="copymeal" data-meal="${k}">${ic("repeat",15)} Repetir de ${d===TODAY()?"ontem":short(prev)} (${nf(sumItems(prevDay.meals[k]).kcal)} kcal)</button>`:""}${items.length?`<button class="btn sm ghost" data-act="savemeal" data-meal="${k}">${ic("star",15)} Salvar esta refeição</button>`:""}</div>`:""}</div>`;}).join("");
   $("#app").innerHTML=`${dayBar()}${banner}
   <div class="grid g2" style="margin-bottom:14px">
     <div class="card"><div class="sum">${ring(tot.kcal,tg.kcal)}<div class="macros">
@@ -281,15 +281,15 @@ function renderDiario(){
       ${cyc?`<div class="row" style="margin-top:12px"><span class="small muted">Hoje é dia de</span><div class="seg"><button class="${isTrainDay(d)?"on":""}" data-act="trainday" data-v="1">Treino</button><button class="${!isTrainDay(d)?"on":""}" data-act="trainday" data-v="0">Descanso</button></div></div>`:""}</div>
     <div class="card">
       <div class="kv"><span>Peso de hoje (kg)</span><input type="number" step="0.1" min="20" max="400" id="wInput" value="${day.weight||""}" placeholder="ex: 78,4" style="width:110px;text-align:right"></div>
-      <div class="kv" style="display:block"><div class="row"><span>Água</span><span class="sp"></span><span class="num small"><b>${nf((day.water||0)/1000,2)}</b> / ${nf(waterT/1000,1)} L</span><button class="btn sm" data-act="water" data-n="-250">−</button><button class="btn sm" data-act="water" data-n="250">+ 250 ml</button></div><div class="water">${Array.from({length:cups},(_,i)=>`<i class="${i<have?"on":""}"></i>`).join("")}</div></div>
+      <div class="kv" style="display:block"><div class="row"><span>Água</span><span class="sp"></span><span class="num small"><b>${nf((day.water||0)/1000,2)}</b> / ${nf(waterT/1000,1)} L</span><button class="btn sm" data-act="water" data-n="-250">−</button><button class="btn sm" data-act="water" data-n="250">${ic("droplet",15)} + 250 ml</button></div><div class="water">${Array.from({length:cups},(_,i)=>`<i class="${i<have?"on":""}"></i>`).join("")}</div></div>
       <div class="kv"><span>Treino do dia</span><a href="#treino" class="small">${(day.workouts||[]).length?`${day.workouts.length} atividade(s) · ~${nf(ex)} kcal`:"Registrar treino →"}</a></div>
-      ${(p.supps||[]).length?`<div class="kv" style="display:block"><div class="row"><span>Suplementos do dia</span><span class="sp"></span><a href="#perfil" class="tiny">editar</a></div><div class="chips" style="margin-top:6px">${p.supps.map(sp=>`<button class="chip ${(day.supps||{})[sp.id]?"on":""}" data-act="suppck" data-id="${esc(sp.id)}">${(day.supps||{})[sp.id]?"✓ ":""}${esc(sp.name)}${sp.dose?` · ${esc(sp.dose)}`:""}</button>`).join("")}</div></div>`:`<div class="kv"><span>Suplementos do dia</span><a href="#perfil" class="small">Configurar rotina →</a></div>`}
+      ${(p.supps||[]).length?`<div class="kv" style="display:block"><div class="row"><span>Suplementos do dia</span><span class="sp"></span><a href="#perfil" class="tiny">editar</a></div><div class="chips" style="margin-top:6px">${p.supps.map(sp=>`<button class="chip ${(day.supps||{})[sp.id]?"on":""}" data-act="suppck" data-id="${esc(sp.id)}">${(day.supps||{})[sp.id]?ic("check",14)+" ":""}${esc(sp.name)}${sp.dose?` · ${esc(sp.dose)}`:""}</button>`).join("")}</div></div>`:`<div class="kv"><span>Suplementos do dia</span><a href="#perfil" class="small">Configurar rotina →</a></div>`}
       <div class="kv"><span>Sequência de registros</span><b class="num">${st} dia${st===1?"":"s"}</b></div>
       <label class="switch tiny muted" style="margin-top:8px"><input type="checkbox" id="incInput" ${day.incomplete?"checked":""}> Registro incompleto (não usar este dia no ajuste da dieta)</label>
     </div></div>
   <div class="grid">${meals}</div>
   <div class="card" style="margin-top:14px"><label class="f">Anotações do dia<textarea id="noteInput" rows="2" placeholder="Fome, sono, humor, eventos…">${esc(day.note||"")}</textarea></label>
-  <div class="row" style="margin-top:10px"><span class="tiny muted" id="saveHint">Tudo é salvo automaticamente enquanto você usa.</span><span class="sp"></span><button class="btn pri" data-act="saveall">💾 Salvar dia</button></div></div>`;
+  <div class="row" style="margin-top:10px"><span class="tiny muted" id="saveHint">Tudo é salvo automaticamente enquanto você usa.</span><span class="sp"></span><button class="btn pri" data-act="saveall">${ic("save")} Salvar dia</button></div></div>`;
   bindDayPicker();
   $("#wInput").addEventListener("change",e=>{const v=numv(e.target.value);const dd=getDay(d,true);dd.weight=v&&v>20?r1(v):null;saveDay(d);toast(dd.weight?"Peso registrado":"Peso removido")});
   $("#noteInput").addEventListener("input",e=>{getDay(d,true).note=e.target.value;saveDay(d)});
@@ -304,14 +304,14 @@ $("#modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()})
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
 const mealName=k=>(MEALS.find(m=>m[0]===k)||[,""])[1];
 function openAdd(meal){M.meal=meal;M.food=null;M.edit=null;M.q="";M.mode="search";showModal();renderModal()}
-function mhead(t,back=true){return `<div class="mhead">${back?`<button class="iconbtn" data-act="mback">‹</button>`:""}<h3>${t}</h3><button class="iconbtn" data-act="close">✕</button></div>`}
+function mhead(t,back=true){return `<div class="mhead">${back?`<button class="iconbtn" data-act="mback" aria-label="Voltar">${ic("chevL")}</button>`:""}<h3>${t}</h3><button class="iconbtn" data-act="close" aria-label="Fechar">${ic("x")}</button></div>`}
 function renderModal(){
   const fn={qty:renderQty,quick:renderQuick,create:renderCreate,saved:renderSaved,photo:renderPhoto,recipe:renderRecipe,savemeal:renderSaveMeal}[M.mode];
   if(fn)return fn();
   const nSaved=(S.profile.saved||[]).length;
   $("#mbody").innerHTML=`${mhead("Adicionar em "+esc(mealName(M.meal)),false)}
   <input type="search" id="fsearch" placeholder="Buscar alimento — ex: arroz, frango, açaí, whey growth" value="${esc(M.q)}" autocomplete="off">
-  <div class="chips" style="margin-top:10px">${S.ai?`<button class="chip" data-act="mphoto">📷 Foto do prato</button>`:""}${nSaved?`<button class="chip" data-act="msaved">☆ Refeições salvas (${nSaved})</button>`:""}<button class="chip" data-act="mquick">⚡ Lançamento rápido</button><button class="chip" data-act="mcreate">+ Criar alimento</button>${S.ai?`<button class="chip" data-act="mcreate" data-ai="1">✦ Estimar com IA</button>`:""}</div>
+  <div class="chips" style="margin-top:10px">${S.ai?`<button class="chip" data-act="mphoto">${ic("camera",15)} Foto do prato</button>`:""}${nSaved?`<button class="chip" data-act="msaved">${ic("star",15)} Refeições salvas (${nSaved})</button>`:""}<button class="chip" data-act="mquick">${ic("zap",15)} Lançamento rápido</button><button class="chip" data-act="mcreate">${ic("plus",15)} Criar alimento</button>${S.ai?`<button class="chip" data-act="mcreate" data-ai="1">${ic("sparkles",15)} Estimar com IA</button>`:""}</div>
   <div id="fresults" class="flist"></div>`;
   const inp=$("#fsearch");inp.addEventListener("input",e=>{M.q=e.target.value;renderResults()});setTimeout(()=>inp.focus(),30);renderResults();
 }
@@ -319,7 +319,7 @@ function searchFoods(q,limit=40){
   q=norm(q);if(!q)return [];const words=q.split(/\s+/);
   return allFoods().filter(f=>{const n=norm(f.name+" "+f.cat);return words.every(w=>n.includes(w))}).sort((a,b)=>{const an=norm(a.name).startsWith(q)?0:1,bn=norm(b.name).startsWith(q)?0:1;return an-bn||a.name.localeCompare(b.name)}).slice(0,limit);
 }
-function foodRow(f,act){return `<button class="fitem" data-act="${act}" data-fid="${esc(f.id)}"><div class="nm"><div>${esc(f.name)} ${f.recipe?'<span class="tag">receita</span>':f.ai?'<span class="tag ai">IA</span>':f.custom?'<span class="tag">meu</span>':""}</div><div class="tiny muted">${nf(f.kcal)} kcal · P ${nf(f.p,1)} · C ${nf(f.c,1)} · G ${nf(f.g,1)} por 100 g</div></div><span class="muted">›</span></button>`}
+function foodRow(f,act){return `<button class="fitem" data-act="${act}" data-fid="${esc(f.id)}"><div class="nm"><div>${esc(f.name)} ${f.recipe?'<span class="tag">receita</span>':f.ai?'<span class="tag ai">IA</span>':f.custom?'<span class="tag">meu</span>':""}</div><div class="tiny muted">${nf(f.kcal)} kcal · P ${nf(f.p,1)} · C ${nf(f.c,1)} · G ${nf(f.g,1)} por 100 g</div></div><span class="muted">${ic("chevR",16)}</span></button>`}
 function renderResults(){
   const q=norm(M.q);let list;
   if(!q){const rec=(S.profile.recent||[]).map(foodById).filter(Boolean);list=rec.length?rec:FOODS.slice(0,12)}else list=searchFoods(q);
@@ -369,7 +369,7 @@ function quickSave(){
   saveDay(S.date);closeModal();render();toast("Adicionado");
 }
 function createFormHTML(ai){
-  return `${ai?`<div class="card" style="background:var(--accent-soft);border-color:transparent;margin-bottom:12px"><label class="f">Descreva o alimento<input type="text" id="aiq" placeholder="ex: tacacá, maniçoba, pão integral da padaria X"></label><div class="row" style="margin-top:8px"><button class="btn pri sm" data-act="aiask">✦ Estimar valores</button><span class="tiny muted" id="aist">A IA estima os valores por 100 g (TACO/TBCA). Confira antes de salvar.</span></div></div>`:""}
+  return `${ai?`<div class="card" style="background:var(--accent-soft);border-color:transparent;margin-bottom:12px"><label class="f">Descreva o alimento<input type="text" id="aiq" placeholder="ex: tacacá, maniçoba, pão integral da padaria X"></label><div class="row" style="margin-top:8px"><button class="btn pri sm" data-act="aiask">${ic("sparkles",15)} Estimar valores</button><span class="tiny muted" id="aist">A IA estima os valores por 100 g (TACO/TBCA). Confira antes de salvar.</span></div></div>`:""}
   <div class="form"><label class="f" style="grid-column:1/-1">Nome do alimento<input type="text" id="cn" placeholder="ex: Pão integral da padaria"></label>
     <label class="f">Valores referentes a (g ou ml)<input type="number" id="cb" value="100" step="any"><span class="hint">Use a porção do rótulo, ex: 30</span></label>
     <label class="f">Calorias (kcal)<input type="number" id="ck" step="any"></label><label class="f">Proteína (g)<input type="number" id="cp" step="any"></label><label class="f">Carboidratos (g)<input type="number" id="cc" step="any"></label>
@@ -408,7 +408,7 @@ function renderSaveMeal(){
 }
 function renderSaved(){
   const list=S.profile.saved||[];
-  $("#mbody").innerHTML=`${mhead("Refeições salvas")}<div class="flist">${list.map(sm=>{const s=sumItems(sm.items);return `<button class="fitem" data-act="usesaved" data-id="${esc(sm.id)}"><div class="nm"><div>${esc(sm.name)}</div><div class="tiny muted">${sm.items.length} itens · ${nf(s.kcal)} kcal · P ${nf(s.p)} · C ${nf(s.c)} · G ${nf(s.g)}</div></div><span class="muted">+</span></button>`}).join("")||`<div class="empty">Nenhuma refeição salva ainda.</div>`}</div>`;
+  $("#mbody").innerHTML=`${mhead("Refeições salvas")}<div class="flist">${list.map(sm=>{const s=sumItems(sm.items);return `<button class="fitem" data-act="usesaved" data-id="${esc(sm.id)}"><div class="nm"><div>${esc(sm.name)}</div><div class="tiny muted">${sm.items.length} itens · ${nf(s.kcal)} kcal · P ${nf(s.p)} · C ${nf(s.c)} · G ${nf(s.g)}</div></div><span class="muted">${ic("plus",16)}</span></button>`}).join("")||`<div class="empty">Nenhuma refeição salva ainda.</div>`}</div>`;
 }
 /* foto do prato */
 async function compressImage(file,max=1024,q=0.82){
@@ -419,7 +419,7 @@ async function compressImage(file,max=1024,q=0.82){
 }
 function renderPhoto(){
   const P=M.photo||{};
-  let body=`<label class="btn pri" style="cursor:pointer">📷 Tirar foto / escolher imagem<input type="file" id="phf" accept="image/*" capture="environment" hidden></label>
+  let body=`<label class="btn pri" style="cursor:pointer">${ic("camera")} Tirar foto / escolher imagem<input type="file" id="phf" accept="image/*" capture="environment" hidden></label>
   <label class="f" style="margin-top:10px">Observação (opcional)<input type="text" id="phh" placeholder="ex: arroz integral, frango grelhado, sem óleo" value="${esc(P.hint||"")}"></label>`;
   if(P.preview)body+=`<img src="${P.preview}" style="width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin-top:10px">`;
   if(P.loading)body+=`<p class="small muted">Analisando a foto…</p>`;
@@ -449,7 +449,7 @@ function renderRecipe(){
    <label class="f">Peso final pronto (g)<input type="number" id="ry" value="${R.yieldG||""}" placeholder="${nf(raw)}"><span class="hint">Pese a receita pronta; vazio = soma dos ingredientes</span></label>
    <label class="f">Rende quantas porções<input type="number" id="rs" value="${R.servings||""}" placeholder="ex: 8"></label></div>
   <h3 style="margin:14px 0 6px">Ingredientes</h3>
-  ${R.ings.map((i,ix)=>`<div class="ing"><div class="nm">${esc(i.name)}<div class="tiny muted">${nf(i.kcal)} kcal</div></div><input type="number" data-rg="${ix}" value="${i.q}"> g<button class="iconbtn" data-act="rdel" data-ix="${ix}">✕</button></div>`).join("")||`<div class="empty" style="padding-left:0">Busque e adicione os ingredientes abaixo.</div>`}
+  ${R.ings.map((i,ix)=>`<div class="ing"><div class="nm">${esc(i.name)}<div class="tiny muted">${nf(i.kcal)} kcal</div></div><input type="number" data-rg="${ix}" value="${i.q}"> g<button class="iconbtn" data-act="rdel" data-ix="${ix}">${ic("x",16)}</button></div>`).join("")||`<div class="empty" style="padding-left:0">Busque e adicione os ingredientes abaixo.</div>`}
   <input type="search" id="rsearch" placeholder="Adicionar ingrediente…" style="margin-top:10px" autocomplete="off"><div id="rres" class="flist"></div>
   <div class="preview"><div><b class="num">${nf(tot.kcal)}</b><span>kcal total</span></div><div><b class="num" style="color:var(--p)">${nf(tot.p)}</b><span>proteína g</span></div><div><b class="num" style="color:var(--c)">${nf(tot.c)}</b><span>carbo g</span></div><div><b class="num" style="color:var(--g)">${nf(tot.g)}</b><span>gordura g</span></div></div>
   <div class="row"><span class="small muted" id="rper"></span><span class="sp"></span><button class="btn pri" data-act="rsave">Salvar receita</button></div>`;
@@ -482,7 +482,7 @@ function cardioEstimate(x){
 function recalcCardio(x){x.kcal=cardioEstimate(x)}
 function cardioHTML(x,i){
   const hasDist=DIST_CARDIO.includes(x.ctype);const pace=hasDist?paceTxt(x.min,x.km):"";
-  return `<div class="ex"><div class="ex-h"><span class="tag">Cardio</span><select data-w="${i}" data-f="ctype">${CARDIO.map(c=>`<option value="${c[0]}" ${c[0]===x.ctype?"selected":""}>${c[1]}</option>`).join("")}</select><button class="iconbtn" data-act="wdel" data-i="${i}" title="Remover">✕</button></div>
+  return `<div class="ex"><div class="ex-h"><span class="tag">Cardio</span><select data-w="${i}" data-f="ctype">${CARDIO.map(c=>`<option value="${c[0]}" ${c[0]===x.ctype?"selected":""}>${c[1]}</option>`).join("")}</select><button class="iconbtn" data-act="wdel" data-i="${i}" title="Remover">${ic("x",16)}</button></div>
   <div class="form"><label class="f">Duração (min)<input type="number" data-w="${i}" data-f="min" value="${x.min||""}" min="0" inputmode="decimal"></label>
   ${hasDist?`<label class="f">Distância (km)<input type="number" step="0.01" data-w="${i}" data-f="km" value="${x.km||""}" inputmode="decimal"></label>`:""}
   <label class="f">Calorias do relógio/app<input type="number" data-w="${i}" data-f="kcalManual" value="${x.kcalManual||""}" placeholder="${x.kcal?"estimado: "+x.kcal:"ex: 420"}" inputmode="decimal"><span class="hint">${x.kcalManual?"Usando o valor que você informou":"Se deixar vazio, uso a estimativa"+(x.kcal?` (${x.kcal} kcal)`:"")}</span></label></div>
@@ -495,10 +495,10 @@ function renderTreino(){
   const exHTML=(day.workouts||[]).map((x,i)=>{
     if(x.type==="cardio")return cardioHTML(x,i);
     const h=exHistory(x.name,d);
-    return `<div class="ex"><div class="ex-h"><input type="text" list="exlist" data-w="${i}" data-f="name" value="${esc(x.name)}" placeholder="Nome do exercício"><button class="iconbtn" data-act="wdel" data-i="${i}" title="Remover">✕</button></div>
+    return `<div class="ex"><div class="ex-h"><input type="text" list="exlist" data-w="${i}" data-f="name" value="${esc(x.name)}" placeholder="Nome do exercício"><button class="iconbtn" data-act="wdel" data-i="${i}" title="Remover">${ic("x",16)}</button></div>
     <table class="sets"><thead><tr><th>Série</th><th>Repetições</th><th>Carga (kg)</th><th></th></tr></thead><tbody>
-    ${(x.sets||[]).map((s,j)=>`<tr><td class="muted">${j+1}</td><td><input type="number" min="0" data-w="${i}" data-s="${j}" data-f="r" value="${s.r??""}" inputmode="numeric"></td><td><input type="number" step="0.5" min="0" data-w="${i}" data-s="${j}" data-f="kg" value="${s.kg??""}" inputmode="decimal"></td><td><button class="iconbtn" data-act="sdel" data-i="${i}" data-j="${j}">✕</button></td></tr>`).join("")}</tbody></table>
-    <div class="row" style="margin-top:6px"><button class="btn sm" data-act="sadd" data-i="${i}">+ Série</button></div>
+    ${(x.sets||[]).map((s,j)=>`<tr><td class="muted">${j+1}</td><td><input type="number" min="0" data-w="${i}" data-s="${j}" data-f="r" value="${s.r??""}" inputmode="numeric"></td><td><input type="number" step="0.5" min="0" data-w="${i}" data-s="${j}" data-f="kg" value="${s.kg??""}" inputmode="decimal"></td><td><button class="iconbtn" data-act="sdel" data-i="${i}" data-j="${j}">${ic("x",16)}</button></td></tr>`).join("")}</tbody></table>
+    <div class="row" style="margin-top:6px"><button class="btn sm" data-act="sadd" data-i="${i}">${ic("plus",15)} Série</button></div>
     ${h&&(h.last||h.best)?`<div class="hist">${h.last?`Última vez (${short(h.last.d)}): ${esc(setsTxt(h.last.sets))}`:""}${h.best?` · <span class="pr">Recorde: ${nf(h.best.kg,h.best.kg%1?1:0)} kg × ${h.best.r}</span> (1RM est. ${nf(h.best.e)} kg)`:""}</div>`:""}</div>`;
   }).join("");
   const recent=prevW.slice(0,8).map(x=>{const dd=S.days[x];const km=dayKm(x);return `<div class="kv"><span>${esc(fmtDate(x,{weekday:"short",day:"2-digit",month:"2-digit"}))} ${dd.wname?`· <b>${esc(dd.wname)}</b>`:""}</span><span class="muted small">${(dd.workouts||[]).length} ativ.${km?` · ${nf(km,1)} km`:""} <button class="btn sm ghost" data-act="goday" data-d="${x}">abrir</button></span></div>`}).join("");
@@ -509,7 +509,7 @@ function renderTreino(){
       ${prevW.length?`<label class="f">Repetir um treino anterior<select id="wcopy"><option value="">Escolher…</option>${prevW.map(x=>`<option value="${x}">${esc(short(x)+" — "+(S.days[x].wname||((S.days[x].workouts||[]).map(w=>w.name||(CARDIO.find(c=>c[0]===w.ctype)||[,"Cardio"])[1]).slice(0,3).join(", "))))}</option>`).join("")}</select></label>`:""}
     </div></div>
     ${exHTML||`<div class="card empty" style="margin-bottom:10px">Nenhuma atividade neste dia. Adicione abaixo ou repita um treino anterior.</div>`}
-    <div class="row"><button class="btn pri" data-act="wadd" data-t="forca">+ Musculação</button><button class="btn" data-act="wadd" data-t="cardio">+ Corrida / cardio</button><button class="btn" data-act="wadd" data-t="luta">+ Kickboxing / luta</button></div>
+    <div class="row"><button class="btn pri" data-act="wadd" data-t="forca">${ic("plus",15)} Musculação</button><button class="btn" data-act="wadd" data-t="cardio">${ic("plus",15)} Corrida / cardio</button><button class="btn" data-act="wadd" data-t="luta">${ic("plus",15)} Kickboxing / luta</button></div>
     <datalist id="exlist">${EXERCISES.concat(knownExercises()).filter((v,i,a)=>a.indexOf(v)===i).map(e=>`<option value="${esc(e)}">`).join("")}</datalist>
   </div><div>
     <div class="grid g4" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
@@ -579,7 +579,7 @@ function renderProgresso(){
     <div class="tile"><div class="t">Proteína média</div><div class="v num">${avg("p")!=null?nf(avg("p"))+" g":"—"}</div><div class="s">meta ${nf(P.targets.p)} g/dia</div></div>
     <div class="tile"><div class="t">Aderência</div><div class="v num">${logged.length?nf(within/logged.length*100)+"%":"—"}</div><div class="s">${logged.length}/${days.length} dias · ${trainings} treinos${km?` · ${nf(km,1)} km`:""}</div></div>
   </div>
-  <div class="card" style="margin-bottom:14px"><div class="row"><h2 style="margin:0">Relatório semanal com IA</h2><span class="sp"></span>${S.ai?`<button class="btn pri sm" data-act="aireport">✦ Gerar relatório da semana</button>`:`<span class="tiny muted">IA desativada — veja em Perfil como ativar</span>`}</div>
+  <div class="card" style="margin-bottom:14px"><div class="row"><h2 style="margin:0">Relatório semanal com IA</h2><span class="sp"></span>${S.ai?`<button class="btn pri sm" data-act="aireport">${ic("sparkles",15)} Gerar relatório da semana</button>`:`<span class="tiny muted">IA desativada — veja em Perfil como ativar</span>`}</div>
     <div class="aiout" id="aiout">${lastRep?`<div class="tiny muted" style="margin-top:6px">Gerado em ${short(lastRep.date)}</div>${mdLite(lastRep.text)}`:`<p class="small muted" style="margin-bottom:0">Um resumo do que funcionou, onde a proteína ou as calorias ficaram fora e sugestões para a próxima semana.</p>`}</div></div>
   <div class="grid g2" style="grid-template-columns:1fr 1fr;margin-bottom:14px">
     <div class="card"><h2>Peso e tendência</h2><div class="chartbox"><canvas id="chW"></canvas></div><div class="tiny muted">Pontos = balança; linha = tendência, que filtra a variação de água.</div></div>
@@ -623,7 +623,7 @@ function renderCorpo(){
   </div>
   <div class="card" style="margin-top:14px"><div class="row"><h2 style="margin:0">Fotos de progresso</h2><span class="sp"></span>
     <select id="ppose" style="width:auto"><option value="frente">Frente</option><option value="lado">Lado</option><option value="costas">Costas</option></select>
-    <label class="btn pri" style="cursor:pointer">📷 Adicionar foto de ${d===TODAY()?"hoje":short(d)}<input type="file" id="pfile" accept="image/*" capture="environment" hidden></label></div>
+    <label class="btn pri" style="cursor:pointer">${ic("camera")} Adicionar foto de ${d===TODAY()?"hoje":short(d)}<input type="file" id="pfile" accept="image/*" capture="environment" hidden></label></div>
     <p class="tiny muted">As fotos ficam privadas na sua conta. Mesma luz, mesmo lugar e mesma pose ajudam a comparar.</p>
     <div class="photos" id="pday"></div>
     ${photoDays.length>1?`<h3 style="margin:18px 0 8px">Comparar lado a lado</h3><div class="row" style="margin-bottom:10px"><select id="pa" style="width:auto">${photoDays.map(x=>`<option ${x===CORPO.a?"selected":""}>${x}</option>`).join("")}</select><span class="muted">×</span><select id="pb" style="width:auto">${photoDays.map(x=>`<option ${x===CORPO.b?"selected":""}>${x}</option>`).join("")}</select><select id="pp" style="width:auto"><option value="frente">Frente</option><option value="lado">Lado</option><option value="costas">Costas</option></select></div><div class="compare" id="pcmp"></div>`:""}
@@ -691,14 +691,14 @@ function renderCoach(){
 let foodQ="",foodCat="";
 function renderAlimentos(){
   const cats=[...new Set(allFoods().map(f=>f.cat))];const saved=S.profile.saved||[];
-  $("#app").innerHTML=`<div class="row" style="margin-bottom:12px"><h1 style="margin:0">Alimentos</h1><span class="sp"></span><button class="btn pri" data-act="newrecipe">+ Criar receita</button><button class="btn" data-act="newfoodpage">+ Criar alimento</button>${S.ai?`<button class="btn" data-act="newfoodpage" data-ai="1">✦ Estimar com IA</button>`:""}</div>
+  $("#app").innerHTML=`<div class="row" style="margin-bottom:12px"><h1 style="margin:0">Alimentos</h1><span class="sp"></span><button class="btn pri" data-act="newrecipe">${ic("plus",15)} Criar receita</button><button class="btn" data-act="newfoodpage">${ic("plus",15)} Criar alimento</button>${S.ai?`<button class="btn" data-act="newfoodpage" data-ai="1">${ic("sparkles",15)} Estimar com IA</button>`:""}</div>
   <p class="small muted" style="margin-top:0">Valores por 100 g (ou 100 ml), base TACO/UNICAMP e TBCA/USP; suplementos pelo rótulo do fabricante. Itens preparados variam conforme a receita.</p>
-  ${saved.length?`<div class="card" style="margin-bottom:14px"><h2>Refeições salvas</h2>${saved.map(sm=>{const s=sumItems(sm.items);return `<div class="kv"><span><b>${esc(sm.name)}</b> <span class="small muted">· ${sm.items.length} itens · ${nf(s.kcal)} kcal · P ${nf(s.p)} · C ${nf(s.c)} · G ${nf(s.g)}</span></span><button class="iconbtn" data-act="delsaved" data-id="${esc(sm.id)}">✕</button></div>`}).join("")}</div>`:""}
+  ${saved.length?`<div class="card" style="margin-bottom:14px"><h2>Refeições salvas</h2>${saved.map(sm=>{const s=sumItems(sm.items);return `<div class="kv"><span><b>${esc(sm.name)}</b> <span class="small muted">· ${sm.items.length} itens · ${nf(s.kcal)} kcal · P ${nf(s.p)} · C ${nf(s.c)} · G ${nf(s.g)}</span></span><button class="iconbtn" data-act="delsaved" data-id="${esc(sm.id)}">${ic("x",16)}</button></div>`}).join("")}</div>`:""}
   <div class="row" style="margin-bottom:12px"><input type="search" id="fq" placeholder="Buscar…" value="${esc(foodQ)}" style="max-width:320px"><select id="fc" style="max-width:260px"><option value="">Todas as categorias</option>${cats.map(c=>`<option ${c===foodCat?"selected":""}>${esc(c)}</option>`).join("")}</select></div>
   <div class="card tw" id="ftable"></div>`;
   const draw=()=>{const q=norm(foodQ);const list=allFoods().filter(f=>(!foodCat||f.cat===foodCat)&&(!q||norm(f.name).includes(q)));
     $("#ftable").innerHTML=`<table class="t"><thead><tr><th>Alimento</th><th>Categoria</th><th class="r">kcal</th><th class="r">Prot.</th><th class="r">Carb.</th><th class="r">Gord.</th><th class="r">Fibra</th><th>Porções</th><th></th></tr></thead><tbody>
-    ${list.map(f=>`<tr><td><b>${esc(f.name)}</b> ${f.ai?'<span class="tag ai">IA</span>':""}</td><td class="muted">${esc(f.cat)}</td><td class="r num">${nf(f.kcal)}</td><td class="r num">${nf(f.p,1)}</td><td class="r num">${nf(f.c,1)}</td><td class="r num">${nf(f.g,1)}</td><td class="r num">${nf(f.fib,1)}</td><td class="muted small">${esc((f.portions||[]).map(p=>`${p[0]} ${nf(p[1],p[1]%1?1:0)} g`).join(" · "))}</td><td style="white-space:nowrap">${f.recipe?`<button class="iconbtn" data-act="editrecipe" data-fid="${esc(f.id)}" title="Editar">✎</button>`:""}${f.custom?`<button class="iconbtn" data-act="delfood" data-fid="${esc(f.id)}" title="Excluir">✕</button>`:""}</td></tr>`).join("")}
+    ${list.map(f=>`<tr><td><b>${esc(f.name)}</b> ${f.ai?'<span class="tag ai">IA</span>':""}</td><td class="muted">${esc(f.cat)}</td><td class="r num">${nf(f.kcal)}</td><td class="r num">${nf(f.p,1)}</td><td class="r num">${nf(f.c,1)}</td><td class="r num">${nf(f.g,1)}</td><td class="r num">${nf(f.fib,1)}</td><td class="muted small">${esc((f.portions||[]).map(p=>`${p[0]} ${nf(p[1],p[1]%1?1:0)} g`).join(" · "))}</td><td style="white-space:nowrap">${f.recipe?`<button class="iconbtn" data-act="editrecipe" data-fid="${esc(f.id)}" title="Editar" aria-label="Editar">${ic("pencil",16)}</button>`:""}${f.custom?`<button class="iconbtn" data-act="delfood" data-fid="${esc(f.id)}" title="Excluir">${ic("x",16)}</button>`:""}</td></tr>`).join("")}
     </tbody></table>${list.length?"":`<div class="empty">Nada encontrado.</div>`}`};
   $("#fq").addEventListener("input",e=>{foodQ=e.target.value;draw()});$("#fc").addEventListener("change",e=>{foodCat=e.target.value;draw()});draw();
 }
@@ -746,8 +746,8 @@ function renderRelatorio(){
   const name=S.user.email;
   $("#app").innerHTML=`<div class="row noprint" style="margin-bottom:14px"><h1 style="margin:0">Relatório para o nutricionista</h1><span class="sp"></span>
    <div class="chips">${[[7,"7 dias"],[14,"14 dias"],[30,"30 dias"],[90,"90 dias"]].map(([v,l])=>`<button class="chip ${REP_N==v?"on":""}" data-act="repn" data-v="${v}">${l}</button>`).join("")}</div></div>
-  <div class="row noprint" style="margin-bottom:14px"><button class="btn pri" data-act="print">🖨 Imprimir / salvar PDF</button><button class="btn" data-act="csvdays">⬇ Planilha — resumo por dia</button><button class="btn" data-act="csvfoods">⬇ Planilha — todos os alimentos</button><button class="btn" data-act="csvtrain">⬇ Planilha — treinos</button></div>
-  <div class="card" style="margin-bottom:14px"><h2>NutriPlano — ${esc(name)}</h2><div class="small">Período: <b>${short(days[0])} a ${short(days[days.length-1])}</b> · Objetivo: <b>${esc(GOALS[P.goal].label)}</b>${P.rate?` (${nf(P.rate,2)}% do peso/semana)`:""} · Sexo ${P.sex==="m"?"M":"F"}, ${P.age} anos, ${P.height} cm</div>
+  <div class="row noprint" style="margin-bottom:14px"><button class="btn pri" data-act="print">${ic("printer")} Imprimir / salvar PDF</button><button class="btn" data-act="csvdays">${ic("download")} Planilha — resumo por dia</button><button class="btn" data-act="csvfoods">${ic("download")} Planilha — todos os alimentos</button><button class="btn" data-act="csvtrain">${ic("download")} Planilha — treinos</button></div>
+  <div class="card" style="margin-bottom:14px"><h2>Nutri Plano — ${esc(name)}</h2><div class="small">Período: <b>${short(days[0])} a ${short(days[days.length-1])}</b> · Objetivo: <b>${esc(GOALS[P.goal].label)}</b>${P.rate?` (${nf(P.rate,2)}% do peso/semana)`:""} · Sexo ${P.sex==="m"?"M":"F"}, ${P.age} anos, ${P.height} cm</div>
    <div class="grid g4" style="margin-top:12px"><div class="tile"><div class="t">Meta atual</div><div class="v num" style="font-size:20px">${nf(P.targets.kcal)} kcal</div><div class="s">P ${P.targets.p} · C ${P.targets.c} · G ${P.targets.g} g</div></div>
    <div class="tile"><div class="t">Média consumida</div><div class="v num" style="font-size:20px">${avg("kcal")!=null?nf(avg("kcal"))+" kcal":"—"}</div><div class="s">P ${nf(avg("p"))} · C ${nf(avg("c"))} · G ${nf(avg("g"))} · fibra ${nf(avg("fib"))} g</div></div>
    <div class="tile"><div class="t">Peso (tendência)</div><div class="v num" style="font-size:20px">${(()=>{const a=days.map(d=>tmap[d]).find(v=>v!=null),b=[...days].reverse().map(d=>tmap[d]).find(v=>v!=null);return a!=null&&b!=null?`${nf(a,1)} → ${nf(b,1)} kg`:"—"})()}</div><div class="s">gasto estimado ${nf(P.tdee)} kcal/dia</div></div>
@@ -808,18 +808,18 @@ function previewTargets(){
   box.innerHTML=`<div class="preview" style="margin:0"><div><b class="num">${nf(t.kcal)}</b><span>kcal/dia</span></div><div><b class="num" style="color:var(--p)">${t.p}</b><span>proteína g</span></div><div><b class="num" style="color:var(--c)">${t.c}</b><span>carbo g</span></div><div><b class="num" style="color:var(--g)">${t.g}</b><span>gordura g</span></div></div><div class="tiny muted" style="margin-top:6px">Gasto ${S.profile&&S.profile.tdee?"estimado atual":"pela fórmula"}: ${nf(tdee)} kcal · basal ${nf(bmr(p,w))} kcal${t.floored?` · <b style="color:var(--warn)">limitada ao piso de ${nf(minKcal(p))} kcal</b>`:""}</div>`;
 }
 function onboardingHTML(){
-  return `<div class="welcome"><div class="hero"><h1>Bem-vindo ao NutriPlano</h1><p class="muted" style="margin:0">Registre o que come pela quantidade, acompanhe treinos e peso, e deixe a meta de calorias se ajustar sozinha toda semana.</p></div>
+  return `<div class="welcome"><div class="hero"><h1>Bem-vindo ao Nutri Plano</h1><p class="muted" style="margin:0">Registre o que come pela quantidade, acompanhe treinos e peso, e deixe a meta de calorias se ajustar sozinha toda semana.</p></div>
   <div class="card"><h2>Seus dados</h2>${profileFormHTML(null,true)}<div style="margin-top:14px" id="pfprev"></div><div class="row" style="margin-top:14px"><label class="btn ghost small" style="cursor:pointer">Importar backup do Claude<input type="file" id="impf" accept=".json,application/json" hidden></label><span class="sp"></span><button class="btn pri" data-act="pfcreate">Começar</button></div></div>
   <div class="row" style="margin-top:12px"><span class="tiny muted">${esc(S.user.email)}</span><span class="sp"></span><button class="btn sm ghost" data-act="logout">Sair</button></div></div>`;
 }
 async function renderAccessList(){
   const el=$("#acl");if(!el)return;const {data,error}=await sb.from("allowed_emails").select("*").order("added_at");
   if(error){el.innerHTML=`<div class="small muted">Não consegui carregar a lista.</div>`;return}
-  el.innerHTML=data.map(r=>`<div class="kv"><span>${esc(r.email)} ${r.is_admin?'<span class="tag">admin</span>':""} ${r.note?`<span class="tiny muted">· ${esc(r.note)}</span>`:""}</span>${r.email===S.user.email?"":`<button class="iconbtn" data-act="acldel" data-email="${esc(r.email)}">✕</button>`}</div>`).join("");
+  el.innerHTML=data.map(r=>`<div class="kv"><span>${esc(r.email)} ${r.is_admin?'<span class="tag">admin</span>':""} ${r.note?`<span class="tiny muted">· ${esc(r.note)}</span>`:""}</span>${r.email===S.user.email?"":`<button class="iconbtn" data-act="acldel" data-email="${esc(r.email)}">${ic("x",16)}</button>`}</div>`).join("");
 }
 function renderPerfil(){
   const P=S.profile;const cy=P.cycle||{on:false,trainDays:4,shift:200};
-  $("#app").innerHTML=`<div class="row" style="margin-bottom:14px"><h1 style="margin:0">Perfil e metas</h1><span class="sp"></span><span class="small muted">${esc(S.user.email)}</span><button class="btn sm" data-act="logout">Sair</button></div>
+  $("#app").innerHTML=`<div class="row" style="margin-bottom:14px"><h1 style="margin:0">Perfil e metas</h1><span class="sp"></span><span class="small muted">${esc(S.user.email)}</span><button class="btn sm" data-act="logout">${ic("logout",15)} Sair</button></div>
   <div class="grid g2"><div>
    <div class="card" style="margin-bottom:14px"><h2>Dados e objetivo</h2>${profileFormHTML(P,false)}<div style="margin-top:14px" id="pfprev"></div>
     <label class="switch small" style="margin-top:12px"><input type="checkbox" id="pf_addex" ${P.addExercise?"checked":""}> Somar calorias gastas no treino à meta do dia</label>
@@ -832,15 +832,15 @@ function renderPerfil(){
    <div class="card"><h2>Inteligência artificial</h2>${S.ai?`<p class="small" style="margin:0">✅ Ativada — foto do prato, estimativa de alimentos e relatório semanal disponíveis.</p>`:`<p class="small" style="margin-top:0">Desativada. Para ativar: no painel do Supabase, abra o projeto <b>nutriplano</b> → <b>Edge Functions → Secrets</b> e crie <code>OPENAI_API_KEY</code> com a sua chave da OpenAI. Depois é só recarregar o app.</p>`}</div>
   </div><div>
    <div class="card" style="margin-bottom:14px"><h2>Meus suplementos diários</h2><p class="small muted" style="margin-top:0">Aparecem como checklist no Diário. Para contar calorias (ex: whey), lance no Diário como alimento.</p>
-    ${(P.supps||[]).map(sp=>`<div class="kv"><span>${esc(sp.name)} ${sp.dose?`<span class="muted small">· ${esc(sp.dose)}</span>`:""}</span><button class="iconbtn" data-act="suppdel" data-id="${esc(sp.id)}">✕</button></div>`).join("")}
-    <div class="row" style="margin-top:8px;flex-wrap:nowrap"><input type="text" id="sp_name" list="spl" placeholder="ex: Creatina"><input type="text" id="sp_dose" placeholder="dose, ex: 5 g" style="max-width:120px"><button class="btn sm pri" data-act="suppadd">+</button></div>
+    ${(P.supps||[]).map(sp=>`<div class="kv"><span>${esc(sp.name)} ${sp.dose?`<span class="muted small">· ${esc(sp.dose)}</span>`:""}</span><button class="iconbtn" data-act="suppdel" data-id="${esc(sp.id)}">${ic("x",16)}</button></div>`).join("")}
+    <div class="row" style="margin-top:8px;flex-wrap:nowrap"><input type="text" id="sp_name" list="spl" placeholder="ex: Creatina"><input type="text" id="sp_dose" placeholder="dose, ex: 5 g" style="max-width:120px"><button class="btn sm pri" data-act="suppadd" aria-label="Adicionar">${ic("plus",16)}</button></div>
     <datalist id="spl">${["Creatina","Whey protein","Multivitamínico","Ômega 3","Vitamina D","Cafeína","Magnésio","Colágeno","Glutamina","Pré-treino"].map(x=>`<option value="${x}">`).join("")}</datalist></div>
    ${S.admin?`<div class="card" style="margin-bottom:14px"><h2>Quem pode acessar (admin)</h2><p class="small muted" style="margin-top:0">Só estes e-mails conseguem criar acesso. Depois de incluir, a pessoa entra em “Primeiro acesso” e cria a senha. Cada um vê só os próprios dados.</p>
     <div id="acl"><div class="small muted">Carregando…</div></div>
     <div class="row" style="margin-top:8px;flex-wrap:nowrap"><input type="text" id="acl_email" placeholder="email@exemplo.com" inputmode="email"><input type="text" id="acl_note" placeholder="nome (opcional)" style="max-width:150px"><button class="btn sm pri" data-act="acladd">Liberar</button></div>
     <label class="switch tiny muted" style="margin-top:6px"><input type="checkbox" id="acl_admin"> também é administrador</label></div>`:""}
    <div class="card" style="margin-bottom:14px"><h2>Backup</h2><p class="small muted" style="margin-top:0">Tudo fica salvo no banco. O backup serve para guardar uma cópia ou trazer os dados da versão do Claude.</p>
-    <div class="row"><button class="btn" data-act="export">⬇ Baixar backup (JSON)</button><label class="btn">Importar backup<input type="file" id="impf" accept=".json,application/json" hidden></label></div>
+    <div class="row"><button class="btn" data-act="export">${ic("download")} Baixar backup (JSON)</button><label class="btn">${ic("upload")} Importar backup<input type="file" id="impf" accept=".json,application/json" hidden></label></div>
     <p class="tiny muted">${Object.keys(S.days).length} dias registrados · ${(P.customFoods||[]).length} alimentos e receitas próprios</p></div>
    <div class="card"><h2>Referências</h2><ul class="small" style="padding-left:18px;margin:0;line-height:1.7"><li>Ajuste adaptativo de gasto inspirado no MacroFactor</li><li>Tendência de peso por média móvel exponencial</li><li>Gasto inicial: Mifflin-St Jeor</li><li>Alimentos: TACO (NEPA/UNICAMP) e TBCA (USP); suplementos pelo rótulo</li><li>Exercícios: Compêndio de Atividades Físicas (METs); corrida ≈ 1 kcal/kg/km</li></ul></div>
   </div></div><p class="foot">Ferramenta de acompanhamento — não substitui orientação de nutricionista ou médico.</p>`;
@@ -879,8 +879,8 @@ document.addEventListener("click",async e=>{
     case "trainday":getDay(d,true).train=b.dataset.v==="1";saveDay(d);render();break;
     case "water":{const day=getDay(d,true);day.water=Math.max(0,(day.water||0)+ +b.dataset.n);saveDay(d);render();break}
     case "saveall":{const dd=getDay(d,true);const w=$("#wInput");if(w){const v=numv(w.value);dd.weight=v&&v>20?r1(v):null}const n=$("#noteInput");if(n)dd.note=n.value;saveDay(d);
-      b.disabled=true;b.textContent="Salvando…";for(const k of Object.keys(pending)){clearTimeout(timers[k]);await flush(k)}
-      b.disabled=false;b.textContent=hadError?"Tentar de novo":"✓ Salvo";if(!hadError){toast("Dia salvo");setTimeout(()=>{if(b.isConnected)b.textContent="💾 Salvar dia"},2000)}break}
+      b.disabled=true;b.innerHTML="Salvando…";for(const k of Object.keys(pending)){clearTimeout(timers[k]);await flush(k)}
+      b.disabled=false;b.innerHTML=hadError?"Tentar de novo":ic("check")+" Salvo";if(!hadError){toast("Dia salvo");setTimeout(()=>{if(b.isConnected)b.innerHTML=ic("save")+" Salvar dia"},2000)}break}
     case "suppck":{const day=getDay(d,true);day.supps=day.supps||{};day.supps[b.dataset.id]=!day.supps[b.dataset.id];saveDay(d);render();break}
     case "suppadd":{const n=$("#sp_name").value.trim();if(!n){toast("Informe o suplemento");break}S.profile.supps=(S.profile.supps||[]).concat([{id:uid(),name:n,dose:$("#sp_dose").value.trim()}]);saveProfile();render();break}
     case "suppdel":S.profile.supps=(S.profile.supps||[]).filter(x=>x.id!==b.dataset.id);saveProfile();render();break;
@@ -903,7 +903,7 @@ document.addEventListener("click",async e=>{
     case "radd":{const f=foodById(b.dataset.fid);if(f){M.recipe.ings.push(calcItem(f,100,"g"));renderRecipe();const x=$$("[data-rg]");if(x.length)x[x.length-1].select()}break}
     case "rdel":M.recipe.ings.splice(+b.dataset.ix,1);renderRecipe();break;
     case "rsave":recipeSave();break;
-    case "delfood":{const f=foodById(b.dataset.fid);if(!f)break;if(b.dataset.confirm!=="1"){b.dataset.confirm="1";b.textContent="Excluir?";b.style.color="var(--g)";setTimeout(()=>{b.dataset.confirm="";b.textContent="✕";b.style.color=""},2500);break}
+    case "delfood":{const f=foodById(b.dataset.fid);if(!f)break;if(b.dataset.confirm!=="1"){b.dataset.confirm="1";b.textContent="Excluir?";b.style.color="var(--g)";setTimeout(()=>{b.dataset.confirm="";b.innerHTML=ic("x",16);b.style.color=""},2500);break}
       S.profile.customFoods=S.profile.customFoods.filter(x=>x.id!==f.id);saveProfile();renderAlimentos();break}
     case "wadd":{const day=getDay(d,true);const t=b.dataset.t;
       if(t==="cardio"||t==="luta"){const x={type:"cardio",ctype:t==="luta"?"kickboxing":"corrida",min:t==="luta"?60:30};recalcCardio(x);day.workouts.push(x)}
@@ -932,7 +932,7 @@ document.addEventListener("click",async e=>{
     case "acladd":{const em=$("#acl_email").value.trim().toLowerCase();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){toast("E-mail inválido");break}
       const {error}=await sb.from("allowed_emails").insert({email:em,is_admin:$("#acl_admin").checked,note:$("#acl_note").value.trim()||null});
       if(error){toast(/duplicate/i.test(error.message)?"Esse e-mail já está liberado":"Não consegui liberar");break}$("#acl_email").value="";$("#acl_note").value="";toast(`${em} liberado — agora ele entra em “Primeiro acesso”`);renderAccessList();break}
-    case "acldel":{if(b.dataset.confirm!=="1"){b.dataset.confirm="1";b.textContent="?";setTimeout(()=>{b.dataset.confirm="";b.textContent="✕"},2500);break}
+    case "acldel":{if(b.dataset.confirm!=="1"){b.dataset.confirm="1";b.textContent="?";setTimeout(()=>{b.dataset.confirm="";b.innerHTML=ic("x",16)},2500);break}
       const {error}=await sb.from("allowed_emails").delete().eq("email",b.dataset.email);if(error)toast("Não consegui remover");else{toast("Acesso removido");renderAccessList()}break}
   }
 });

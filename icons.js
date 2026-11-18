@@ -1,0 +1,38 @@
+"use strict";
+/* Nutri Plano — ícones SVG (traço 2px, grade 24×24) e marca. Só aparência. */
+const ICONS={
+  diario:'<path d="M3 2.5v6.5a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2V2.5"/><path d="M6.5 2.5v19"/><path d="M20.5 15V2.5a4.5 4.5 0 0 0-4.5 4.5v6a2 2 0 0 0 2 2h2.5zm0 0v6.5"/>',
+  treino:'<path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/>',
+  progresso:'<path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/>',
+  corpo:'<circle cx="12" cy="4.5" r="2"/><path d="M12 7.5v6M7 10h10M9 21l3-7.5 3 7.5"/>',
+  coach:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/>',
+  alimentos:'<path d="M12 7.5c-2-2-6.2-1.6-7.2 1.8-1 3.6.6 9.4 4.2 10.5 1.3.4 2-.4 3-.4s1.7.8 3 .4c3.6-1.1 5.2-6.9 4.2-10.5C18.2 5.9 14 5.5 12 7.5z"/><path d="M12 7.5c0-2.2 1.2-4 3.2-4.5"/>',
+  calculadora:'<rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M8.5 6.5h7M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h3.5"/>',
+  relatorio:'<path d="M14 2.5H7a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7.5z"/><path d="M14 2.5v5h5M9 13h6M9 17h6M9 9h1.5"/>',
+  perfil:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/>',
+  mais:'<rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  auto:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  chevL:'<path d="M15 6l-6 6 6 6"/>',
+  chevR:'<path d="M9 6l6 6-6 6"/>',
+  camera:'<path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/>',
+  star:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/>',
+  zap:'<path d="M13 2.5L4.5 13.5H12l-1 8 8.5-11H12z"/>',
+  sparkles:'<path d="M11 3l1.8 4.7 4.7 1.8-4.7 1.8L11 16l-1.8-4.7L4.5 9.5l4.7-1.8z"/><path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>',
+  save:'<path d="M5 3.5h11l3.5 3.5v12a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19V5A1.5 1.5 0 0 1 5 3.5z"/><path d="M8 3.5v5h7v-5M7.5 20.5v-6h9v6"/>',
+  printer:'<path d="M6 9V3.5h12V9"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v6.5H6z"/>',
+  download:'<path d="M12 3.5v12M7 10.5l5 5 5-5M4.5 20.5h15"/>',
+  upload:'<path d="M12 15.5v-12M7 8.5l5-5 5 5M4.5 20.5h15"/>',
+  pencil:'<path d="M16.5 3.5l4 4L8 20H4v-4z"/>',
+  repeat:'<path d="M17 2.5l3 3-3 3"/><path d="M4 11.5v-2a4 4 0 0 1 4-4h12"/><path d="M7 21.5l-3-3 3-3"/><path d="M20 12.5v2a4 4 0 0 1-4 4H4"/>',
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+  flame:'<path d="M12 21.5c-4 0-7-2.8-7-6.8 0-3.6 2.6-5.5 4-8.2.6 1.6 1.6 2.6 2.8 3.1C12 6.5 13 4 15 2.5c.4 3.2 4 5.7 4 11.2 0 4.5-3 7.8-7 7.8z"/>',
+  droplet:'<path d="M12 2.8s-6.5 7.2-6.5 11.7a6.5 6.5 0 0 0 13 0C18.5 10 12 2.8 12 2.8z"/>'
+};
+function ic(name,size){const s=size?` width="${size}" height="${size}"`:"";return `<svg class="ic ic-${name}" viewBox="0 0 24 24"${s} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICONS[name]||""}</svg>`}
+const BRAND_MARK='<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="npgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0E7A4F"/><stop offset="1" stop-color="#06452F"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#npgrad)"/><path d="M9.5 22V10.5l13 11.5V10" fill="none" stroke="#B7F000" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="22.5" cy="10" r="2.3" fill="#22C55E" stroke="#06452F" stroke-width="1"/></svg>';
+function brandLockup(cls){return `<span class="brand ${cls||""}"><span class="brand-mark">${BRAND_MARK}</span><span class="brand-txt"><span class="brand-name">Nutri <b>Plano</b></span><span class="brand-slogan">Planeje. Controle. Evolua.</span></span></span>`}
