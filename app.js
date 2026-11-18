@@ -270,7 +270,7 @@ function renderDiario(){
   const cyc=p.cycle&&p.cycle.on;
   const meals=MEALS.map(([k,name])=>{
     const items=day.meals[k]||[];const s=sumItems(items);const canCopy=prevDay&&prevDay.meals&&(prevDay.meals[k]||[]).length;
-    return `<div class="card meal"><div class="meal-h"><h3>${name}</h3><span class="kc num">${nf(s.kcal)} kcal</span>${items.length?pcg(s):""}<span class="sp"></span><button class="btn sm pri" data-act="add" data-meal="${k}">${ic("plus",15)} Adicionar</button></div>
+    return `<div class="card meal meal-${k}"><div class="meal-h"><span class="meal-ic" aria-hidden="true">${ic("m_"+k,20)}</span><h3>${name}</h3><span class="kc num">${nf(s.kcal)} kcal</span>${items.length?pcg(s):""}<span class="sp"></span><button class="btn sm pri meal-add" data-act="add" data-meal="${k}" aria-label="Adicionar em ${name}" title="Adicionar em ${name}">${ic("plus",15)} Adicionar</button></div>
       ${items.length?`<ul class="items">${items.map((i,ix)=>`<li data-act="edit" data-meal="${k}" data-ix="${ix}"><div class="nm"><div>${esc(i.name)}</div><div class="q">${esc(itemQty(i))}</div></div>${pcg(i)}<span class="kc num">${nf(i.kcal)} kcal</span><button class="iconbtn" data-act="del" data-meal="${k}" data-ix="${ix}" title="Remover">${ic("x",16)}</button></li>`).join("")}</ul>`:`<div class="empty">Nada registrado.</div>`}
       ${canCopy||items.length?`<div class="meal-f">${canCopy?`<button class="btn sm ghost" data-act="copymeal" data-meal="${k}">${ic("repeat",15)} Repetir de ${d===TODAY()?"ontem":short(prev)} (${nf(sumItems(prevDay.meals[k]).kcal)} kcal)</button>`:""}${items.length?`<button class="btn sm ghost" data-act="savemeal" data-meal="${k}">${ic("star",15)} Salvar esta refeição</button>`:""}</div>`:""}</div>`;}).join("");
   $("#app").innerHTML=`${dayBar()}${banner}
@@ -310,7 +310,7 @@ function renderModal(){
   const fn={qty:renderQty,quick:renderQuick,create:renderCreate,saved:renderSaved,photo:renderPhoto,recipe:renderRecipe,savemeal:renderSaveMeal}[M.mode];
   if(fn)return fn();
   const nSaved=(S.profile.saved||[]).length;
-  $("#mbody").innerHTML=`${mhead("Adicionar em "+esc(mealName(M.meal)),false)}
+  $("#mbody").innerHTML=`${mhead(`<span class="meal-ic meal-ic-sm meal-${M.meal}">${ic("m_"+M.meal,16)}</span>Adicionar em ${esc(mealName(M.meal))}`,false)}
   <input type="search" id="fsearch" placeholder="Buscar alimento — ex: arroz, frango, açaí, whey growth" value="${esc(M.q)}" autocomplete="off">
   <div class="chips" style="margin-top:10px">${S.ai?`<button class="chip" data-act="mphoto">${ic("camera",15)} Foto do prato</button>`:""}${nSaved?`<button class="chip" data-act="msaved">${ic("star",15)} Refeições salvas (${nSaved})</button>`:""}<button class="chip" data-act="mquick">${ic("zap",15)} Lançamento rápido</button><button class="chip" data-act="mcreate">${ic("plus",15)} Criar alimento</button>${S.ai?`<button class="chip" data-act="mcreate" data-ai="1">${ic("sparkles",15)} Estimar com IA</button>`:""}</div>
   <div id="fresults" class="flist"></div>`;

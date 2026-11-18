@@ -339,3 +339,25 @@ body.np-in main{padding-top:18px}
 
 input[type=checkbox],input[type=radio]{accent-color:var(--accent);width:17px;height:17px}
 details summary::marker{color:var(--accent)}
+
+/* ---------- ícones das refeições ---------- */
+:root{--m-cafe:#B45309;--m-lanche1:#4D7C0F;--m-almoco:#C2410C;--m-lanche2:#BE185D;--m-jantar:#4338CA;--m-ceia:#6D28D9}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--m-cafe:#FBBF24;--m-lanche1:#B7F000;--m-almoco:#FB923C;--m-lanche2:#F472B6;--m-jantar:#A5B4FC;--m-ceia:#C4B5FD}}
+:root[data-theme="dark"]{--m-cafe:#FBBF24;--m-lanche1:#B7F000;--m-almoco:#FB923C;--m-lanche2:#F472B6;--m-jantar:#A5B4FC;--m-ceia:#C4B5FD}
+.meal-cafe{--m:var(--m-cafe)}.meal-lanche1{--m:var(--m-lanche1)}.meal-almoco{--m:var(--m-almoco)}.meal-lanche2{--m:var(--m-lanche2)}.meal-jantar{--m:var(--m-jantar)}.meal-ceia{--m:var(--m-ceia)}
+.meal-ic{flex:none;width:38px;height:38px;display:grid;place-items:center;border-radius:12px;color:var(--m,var(--accent));background:color-mix(in srgb,var(--m,var(--accent)) 13%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--m,var(--accent)) 22%,transparent)}
+.meal-ic .ic{width:20px;height:20px}
+.meal-ic-sm{width:30px;height:30px;border-radius:10px;margin-right:10px;vertical-align:middle;display:inline-grid}
+.meal-ic-sm .ic{width:16px;height:16px}
+.mhead h3{display:flex;align-items:center}
+.meal-h{gap:12px}
+.meal{border-left:none;position:relative}
+.meal::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--m,transparent);opacity:.75}
+@media (max-width:640px){.meal-ic{width:34px;height:34px;border-radius:11px}.meal-ic .ic{width:18px;height:18px}}
+@media (max-width:640px){
+  .meal-h{flex-wrap:nowrap}
+  .meal-h h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .meal-h .kc{white-space:nowrap}
+  .meal-h .btn.sm.meal-add{font-size:0;width:38px;height:38px;min-height:38px;padding:0;justify-content:center;border-radius:12px;gap:0;flex:none}
+  .meal-h .btn.sm.meal-add .ic{width:20px;height:20px}
+}
