@@ -20,3 +20,7 @@ Site estático (HTML/JS) + Supabase (login, banco, fotos, função de IA).
 
 ## Deploy
 Render → Static Site, sem build, publish directory `.`
+
+## Banner do topo
+Edite `banner.js` (título, texto, botão, link, imagem). Para uma campanha nova, troque o `id`.
+Para esconder, use `ativo: false`.

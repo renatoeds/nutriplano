@@ -20,11 +20,11 @@
     const v=(location.hash.slice(1)||"diario");
     document.querySelectorAll("#bnav [data-v]").forEach(a=>a.classList.toggle("on",a.dataset.v===v||(a.dataset.v==="mais"&&MORE.some(m=>m[0]===v))));
   }
-  function syncVisibility(){
+  let syncVisibility=function(){
     const tb=document.getElementById("topbar"),tabs=document.getElementById("tabs");
     const inApp=tb&&tb.style.display!=="none"&&tabs&&tabs.style.visibility!=="hidden";
     document.body.classList.toggle("np-in",!!inApp);
-  }
+  };
   function openMore(){
     showModal();
     document.getElementById("mbody").innerHTML=`<div class="mhead"><h3>Mais</h3><button class="iconbtn" data-act="close" aria-label="Fechar">${ic("x")}</button></div>
@@ -44,6 +44,24 @@
   document.querySelectorAll("#tabs a[data-v]").forEach(a=>a.insertAdjacentHTML("afterbegin",ic(a.dataset.v)));
   document.querySelectorAll("#bnav [data-v]").forEach(a=>a.insertAdjacentHTML("afterbegin",ic(a.dataset.v)));
   const tb=document.getElementById("topbar"),tabs=document.getElementById("tabs");
-  if(window.MutationObserver){const mo=new MutationObserver(syncVisibility);tb&&mo.observe(tb,{attributes:true,attributeFilter:["style"]});tabs&&mo.observe(tabs,{attributes:true,attributeFilter:["style"]})}
+  if(window.MutationObserver){const mo=new MutationObserver(()=>syncVisibility());tb&&mo.observe(tb,{attributes:true,attributeFilter:["style"]});tabs&&mo.observe(tabs,{attributes:true,attributeFilter:["style"]})}
+  // banner do topo (conteúdo em banner.js)
+  function renderPromo(){
+    const el=document.getElementById("promo");if(!el)return;const B=window.NP_BANNER;
+    let closed="";try{closed=localStorage.getItem("np-banner-closed")||""}catch(e){}
+    const show=B&&B.ativo&&B.titulo&&!(B.fechavel&&closed===B.id)&&document.body.classList.contains("np-in");
+    if(!show){el.hidden=true;el.innerHTML="";return}
+    const ext=/^https?:\/\//.test(B.link||"");const e=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    el.innerHTML=`<div class="promo${B.imagem?" has-img":""}" role="region" aria-label="Destaque">
+      <div class="promo-body">${B.selo?`<span class="promo-tag">${e(B.selo)}</span>`:""}<div class="promo-title">${e(B.titulo)}</div>${B.texto?`<div class="promo-text">${e(B.texto)}</div>`:""}</div>
+      ${B.botao&&B.link?`<a class="promo-cta" href="${e(B.link)}"${ext?' target="_blank" rel="noopener"':""}>${e(B.botao)}${ic("chevR",16)}</a>`:""}
+      ${B.imagem?`<img class="promo-img" src="${e(B.imagem)}" alt="">`:""}
+      ${B.fechavel?`<button class="promo-x" data-ui="promo-x" aria-label="Fechar banner">${ic("x",16)}</button>`:""}</div>`;
+    el.hidden=false;
+  }
+  document.addEventListener("click",e=>{if(e.target.closest('[data-ui="promo-x"]')){try{localStorage.setItem("np-banner-closed",(window.NP_BANNER||{}).id||"")}catch(err){}renderPromo()}});
+  const _sv=syncVisibility;syncVisibility=function(){_sv();renderPromo()};
+  // rótulos para o menu recolhido (só ícones)
+  document.querySelectorAll("#tabs a[data-v]").forEach(a=>{a.title=a.textContent.trim();const t=a.childNodes[a.childNodes.length-1];if(t&&t.nodeType===3){const sp=document.createElement("span");sp.className="tab-lbl";sp.textContent=t.textContent;a.replaceChild(sp,t)}});
   applyTheme(getTheme());syncNav();syncVisibility();
 })();

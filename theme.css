@@ -258,3 +258,58 @@ table.t tbody tr:hover td{background:var(--soft)}
 .switch input{accent-color:var(--brand)}
 .foot{text-align:center}
 @media print{.bnav,.themebtn{display:none!important}.banner{background:none;color:#000}}
+
+/* =====================================================================
+   Menu lateral (computador) + banner do topo
+   ===================================================================== */
+:root{--side-w:256px}
+@media (min-width:761px){
+  body.np-in{padding-left:var(--side-w)}
+  body.np-in header.top{position:fixed;top:0;bottom:0;left:0;width:var(--side-w);border-bottom:none;border-right:1px solid var(--line);z-index:25;overflow-y:auto;padding-top:0}
+  body.np-in .top-in{flex-direction:column;align-items:stretch;height:100%;min-height:0;max-width:none;padding:22px 14px 16px;gap:22px}
+  body.np-in .brand{padding:0 6px}
+  body.np-in .brand-slogan{display:block}
+  body.np-in nav.tabs{flex-direction:column;overflow:visible;flex:1;gap:3px;order:0;flex-basis:auto}
+  body.np-in nav.tabs a{display:flex;padding:10px 12px;font-size:14px;gap:12px;border-radius:12px}
+  body.np-in nav.tabs a .ic{display:block;width:19px;height:19px}
+  body.np-in nav.tabs a.on{background:var(--accent-soft);color:var(--accent);box-shadow:inset 3px 0 0 var(--brand)}
+  body.np-in .top-actions{justify-content:space-between;border-top:1px solid var(--line);padding:14px 6px 0}
+  body.np-in main{max-width:1180px}
+}
+/* telas médias: menu só com ícones */
+@media (min-width:761px) and (max-width:1100px){
+  :root{--side-w:78px}
+  body.np-in .top-in{padding:18px 10px 14px;align-items:center}
+  body.np-in .brand-txt{display:none}
+  body.np-in .brand{padding:0}
+  body.np-in nav.tabs{width:100%}
+  body.np-in nav.tabs a{justify-content:center;padding:11px 0}
+  body.np-in nav.tabs a .tab-lbl{display:none}
+  body.np-in .top-actions{flex-direction:column;gap:10px;padding:12px 0 0;width:100%;align-items:center}
+  body.np-in .sync span{display:none}
+}
+
+/* banner */
+.promo-wrap{max-width:1180px;margin:0 auto;padding:18px 20px 0}
+.promo{position:relative;display:flex;align-items:center;gap:18px;min-height:96px;padding:18px 54px 18px 22px;border-radius:22px;overflow:hidden;color:#fff;
+  background:radial-gradient(circle at 92% -30%,rgba(183,240,0,.42) 0,rgba(183,240,0,0) 42%),radial-gradient(circle at 70% 140%,rgba(34,197,94,.45) 0,rgba(34,197,94,0) 45%),linear-gradient(110deg,#1F2937 0%,#06452F 62%,#0B6B44 100%);box-shadow:var(--shadow)}
+.promo-body{flex:1;min-width:0}
+.promo-tag{display:inline-block;background:var(--brand-lime);color:var(--graphite);font:800 10.5px/1 var(--font-ui);letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border-radius:99px;margin-bottom:8px}
+.promo-title{font-family:var(--font-title);font-weight:800;font-size:21px;letter-spacing:-.02em;line-height:1.15}
+.promo-text{font-size:13.5px;color:rgba(255,255,255,.84);margin-top:4px}
+.promo-cta{flex:none;display:inline-flex;align-items:center;gap:6px;background:var(--brand-lime);color:var(--graphite);font-weight:700;font-size:14px;text-decoration:none;padding:10px 14px 10px 16px;border-radius:12px}
+.promo-cta:hover{filter:brightness(1.06);text-decoration:none}
+.promo-img{flex:none;height:76px;max-width:180px;object-fit:contain;border-radius:12px}
+.promo-x{position:absolute;top:10px;right:10px;width:30px;height:30px;display:grid;place-items:center;border:none;border-radius:9px;background:rgba(255,255,255,.12);color:#fff;cursor:pointer}
+.promo-x:hover{background:rgba(255,255,255,.22)}
+body.np-in main{padding-top:18px}
+@media (max-width:760px){
+  .promo-wrap{padding:12px 12px 0}
+  .promo{flex-wrap:wrap;gap:10px;min-height:0;padding:14px 46px 14px 16px;border-radius:18px}
+  .promo-title{font-size:17px}
+  .promo-text{font-size:12.5px}
+  .promo-img{display:none}
+  .promo-body{flex-basis:100%}
+  .promo-cta{padding:8px 12px;font-size:13px}
+}
+@media print{.promo-wrap{display:none!important}body.np-in{padding-left:0!important}header.top{display:none!important}}
