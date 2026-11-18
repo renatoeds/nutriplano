@@ -18,8 +18,8 @@
   --font-ui:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 
   /* tema claro */
-  --bg:#F5F7F6; --card:#FFFFFF; --ink:#1F2937; --muted:#5B6472;
-  --line:#E5E7EB; --soft:#F0F4F2;
+  --bg:#EBEFEC; --card:#FFFFFF; --ink:#1F2937; --muted:#556070;
+  --line:#D5DCD8; --line-soft:#E4E9E6; --soft:#EEF2EF;
   --accent:#0A6B45;            /* texto/ícone de destaque (6,6:1 no branco) */
   --accent-ink:#FFFFFF;
   --accent-soft:#E4F6EA;
@@ -29,9 +29,9 @@
   --p:#2563EB; --c:#D97706; --g:#DB2D5B; --fib:#5E8E1F;
   --warn:#B45309; --warn-soft:#FEF3E2;
   --radius:18px;
-  --shadow:0 1px 2px rgba(31,41,55,.04),0 8px 24px rgba(6,69,47,.06);
+  --shadow:0 1px 2px rgba(31,41,55,.08),0 6px 18px rgba(31,41,55,.07);
   --shadow-lg:0 24px 64px rgba(6,69,47,.18);
-  --header-bg:rgba(255,255,255,.86);
+  --header-bg:rgba(255,255,255,.94);
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){
@@ -313,3 +313,23 @@ body.np-in main{padding-top:18px}
   .promo-cta{padding:8px 12px;font-size:13px}
 }
 @media print{.promo-wrap{display:none!important}body.np-in{padding-left:0!important}header.top{display:none!important}}
+
+/* ---------- tema claro: mais definição entre áreas ---------- */
+:root:not([data-theme="dark"]) .items li,
+:root:not([data-theme="dark"]) .meal-h{border-bottom-color:var(--line-soft,var(--line))}
+:root:not([data-theme="dark"]) .kv{border-bottom-color:var(--line-soft,var(--line))}
+:root:not([data-theme="dark"]) .meal-h{background:#F7F9F8}
+:root:not([data-theme="dark"]) .preview div{background:var(--soft);border:1px solid var(--line-soft,var(--line))}
+:root:not([data-theme="dark"]) .bar,:root:not([data-theme="dark"]) .conf{background:#E2E8E4}
+:root:not([data-theme="dark"]) .ring svg circle:first-child{stroke:#E2E8E4}
+:root:not([data-theme="dark"]) .water i{opacity:.55}
+@media (min-width:761px){:root:not([data-theme="dark"]) body.np-in header.top{background:#FFFFFF;box-shadow:1px 0 0 var(--line),4px 0 18px rgba(31,41,55,.04)}}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .items li,:root:not([data-theme="light"]) .meal-h,:root:not([data-theme="light"]) .kv{border-bottom-color:var(--line)}
+  :root:not([data-theme="light"]) .meal-h{background:transparent}
+  :root:not([data-theme="light"]) .preview div{border:none}
+  :root:not([data-theme="light"]) .bar,:root:not([data-theme="light"]) .conf{background:var(--soft)}
+  :root:not([data-theme="light"]) .ring svg circle:first-child{stroke:var(--soft)}
+  :root:not([data-theme="light"]) .water i{opacity:.35}
+  @media (min-width:761px){:root:not([data-theme="light"]) body.np-in header.top{background:var(--header-bg);box-shadow:none}}
+}
