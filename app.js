@@ -937,7 +937,8 @@ function csvDownloadRaw(name,txt,type){const blob=new Blob([txt],{type});const a
 /* ============ início ============ */
 (async function boot(){
   if(!window.supabase||!CFG.url){$("#app").innerHTML=`<div class="card" style="max-width:520px;margin:40px auto">Não consegui carregar o app (sem conexão). Verifique a internet e recarregue.</div>`;return}
-  const isRecovery=/type=recovery/.test(location.hash);
+  const isRecovery=/type=recovery/.test(location.hash);if(isRecovery)AUTH.mode="recovery";
+  const hashErr=/error_description=([^&]+)/.exec(location.hash);if(hashErr){AUTH.msg=/expired|invalid/i.test(decodeURIComponent(hashErr[1]))?"Este link já foi usado ou expirou. Se você já confirmou o e-mail, é só entrar.":decodeURIComponent(hashErr[1].replace(/\+/g," "));history.replaceState(null,"",location.pathname)}
   sb=window.supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   sb.auth.onAuthStateChange((ev,session)=>{
     if(ev==="PASSWORD_RECOVERY"){AUTH.mode="recovery";AUTH.msg="";renderAuth();return}
