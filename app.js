@@ -542,7 +542,7 @@ function onWorkoutInput(e){
 
 /* ============ PROGRESSO ============ */
 function rangeDays(n){const end=TODAY();let start;if(n==="all"){const ks=Object.keys(S.days).sort();start=ks.length?ks[0]:end}else start=addDays(end,-(n-1));const out=[];for(let d=start;d<=end;d=addDays(d,1))out.push(d);return out}
-function chartDefaults(){Chart.defaults.color=css("--muted");Chart.defaults.borderColor=css("--line");Chart.defaults.font.family='"Plus Jakarta Sans",system-ui,sans-serif';Chart.defaults.font.size=12}
+function chartDefaults(){Chart.defaults.color=css("--muted");Chart.defaults.borderColor=css("--line");Chart.defaults.font.family=css("--font-ui")||"Inter,system-ui,sans-serif";Chart.defaults.font.size=12}
 function groupBy(dates,fn){const m=new Map();dates.forEach(d=>{const k=fn(d);if(!m.has(k))m.set(k,[]);m.get(k).push(d)});return [...m.entries()]}
 function summaryRows(groups,kind){
   const ser=weightSeries();const tmap={};ser.forEach(x=>tmap[x.d]=x.t);let prevT=null;
