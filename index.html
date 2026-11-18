@@ -2,11 +2,13 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-zq5ckMN/nsWVJBgyqHoRuHOnrSuGODBp7PzBCfjfjSQ=' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://odofydzxrdfbxsthabwb.supabase.co; connect-src 'self' https://odofydzxrdfbxsthabwb.supabase.co wss://odofydzxrdfbxsthabwb.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Nutri Plano — Planeje. Controle. Evolua.</title>
 <meta name="description" content="Nutri Plano: diário de alimentação e treino com ajuste automático da dieta.">
 <meta name="theme-color" content="#06452F">
-<script>(function(){try{var t=localStorage.getItem("np-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})();</script>
+<script>(function(){if(window.top!==window.self){try{window.top.location=window.self.location}catch(e){document.documentElement.style.display="none"}}try{var t=localStorage.getItem("np-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})();</script>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="icon" type="image/png" href="icon-192.png">
@@ -16,9 +18,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="base.css?v=20261118e">
-<link rel="stylesheet" href="app.css?v=20261118e">
-<link rel="stylesheet" href="theme.css?v=20261118e">
+<link rel="stylesheet" href="base.css?v=20261118f">
+<link rel="stylesheet" href="app.css?v=20261118f">
+<link rel="stylesheet" href="theme.css?v=20261118f">
 </head>
 <body>
 <header class="top" id="topbar"><div class="top-in">
@@ -49,12 +51,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="config.js?v=20261118e"></script>
-<script src="icons.js?v=20261118e"></script>
-<script src="banner.js?v=20261118e"></script>
-<script src="foods.js?v=20261118e"></script>
-<script src="app.js?v=20261118e"></script>
-<script src="supps.js?v=20261118e"></script>
-<script src="ui.js?v=20261118e"></script>
+<script src="config.js?v=20261118f"></script>
+<script src="icons.js?v=20261118f"></script>
+<script src="banner.js?v=20261118f"></script>
+<script src="foods.js?v=20261118f"></script>
+<script src="app.js?v=20261118f"></script>
+<script src="supps.js?v=20261118f"></script>
+<script src="ui.js?v=20261118f"></script>
 </body>
 </html>

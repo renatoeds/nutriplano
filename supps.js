@@ -117,7 +117,7 @@ function spVerifyRender(){
 async function spVerifyAI(){
   const out=$("#vf-ai-out");out.innerHTML=`<p class="small muted">Pesquisando fontes públicas…</p>`;
   try{const r=await aiCall({action:"verify",product:SPF.name||"",brand:SPF.brand||spBrand(SPF)||""});
-    const src=(r.sources||[]).slice(0,8);
+    const src=(r.sources||[]).filter(x=>x&&/^https?:\/\//i.test(String(x.url||""))).slice(0,8);
     SPV.ai=`<div class="aiout" style="margin-top:8px">${mdLite(r.text||"")}</div>${src.length?`<div class="tiny muted" style="margin-top:6px">Fontes:</div><ul class="vf-src">${src.map(x=>`<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title||x.url)}</a></li>`).join("")}</ul>`:""}<p class="tiny muted">Resumo automático de fontes públicas — pode conter erros. Confira os links.</p>`;
     out.innerHTML=SPV.ai;
   }catch(e){out.innerHTML=`<p class="small" style="color:var(--g)">${e.code==="not_configured"?"A IA ainda não foi ativada.":"Não consegui pesquisar agora. Use os links acima."}</p>`}

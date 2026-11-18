@@ -767,7 +767,7 @@ function renderRelatorio(){
 }
 function workoutTxt(day){return (day.workouts||[]).map(x=>x.type==="cardio"?`${(CARDIO.find(c=>c[0]===x.ctype)||[,"Cardio"])[1]} ${x.min?x.min+" min":""}${x.km?" "+nf(x.km,2)+" km":""}${cardioKcal(x)?" "+cardioKcal(x)+" kcal":""}`:(x.name||"Exercício")).join("; ")}
 function csvDownload(name,rows){
-  const s=rows.map(r=>r.map(v=>{v=v==null?"":String(v);return /[;"\n]/.test(v)?`"${v.replace(/"/g,'""')}"`:v}).join(";")).join("\r\n");
+  const s=rows.map(r=>r.map(v=>{v=v==null?"":String(v);if(/^[=+@\t\r]/.test(v)||/^-[^\d,.]/.test(v))v="'"+v;return /[;"\n]/.test(v)?`"${v.replace(/"/g,'""')}"`:v}).join(";")).join("\r\n");
   const blob=new Blob(["﻿"+s],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
 }
 const dec=n=>n==null||n===""?"":String(r1(n)).replace(".",",");
