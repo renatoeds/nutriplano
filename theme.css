@@ -446,3 +446,13 @@ details summary::marker{color:var(--accent)}
 .pro-hide{display:none}
 .pro-pend{display:flex;gap:12px;align-items:flex-start;border-color:#F59E0B}
 .tag-warn{background:rgba(245,158,11,.16);color:#B45309}
+/* botão Sair no fim do menu lateral */
+nav.tabs .tab-out{display:none}
+@media (min-width:761px){
+  body.np-in nav.tabs .tab-out{display:flex;align-items:center;gap:12px;width:100%;margin-top:8px;padding:10px 12px;border:0;border-top:1px solid var(--line);border-radius:0 0 12px 12px;background:none;color:var(--muted);font:600 14px var(--font-ui);cursor:pointer;text-align:left}
+  body.np-in nav.tabs .tab-out .ic{width:19px;height:19px;flex:none}
+  body.np-in nav.tabs .tab-out:hover{color:#DC2626;background:rgba(220,38,38,.08);border-radius:12px}
+  body.np-in nav.tabs .tab-out:focus-visible{outline:3px solid color-mix(in srgb,var(--brand) 55%,transparent);outline-offset:2px}
+}
+@media (min-width:761px) and (max-width:1100px){body.np-in nav.tabs .tab-out{justify-content:center;padding:11px 0}}
+.more-out{color:#DC2626}

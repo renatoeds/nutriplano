@@ -30,7 +30,8 @@
     showModal();
     document.getElementById("mbody").innerHTML=`<div class="mhead"><h3>Mais</h3><button class="iconbtn" data-act="close" aria-label="Fechar">${ic("x")}</button></div>
       <div class="morelist">${moreList().map(([v,l])=>`<a href="#${v}" data-ui="go">${ic(v)}<span>${l}</span>${ic("chevR")}</a>`).join("")}</div>
-      <button class="btn ghost" data-ui="theme" style="margin-top:10px;width:100%;justify-content:center">${ic("auto")} Trocar tema</button>`;
+      <button class="btn ghost" data-ui="theme" style="margin-top:10px;width:100%;justify-content:center">${ic("auto")} Trocar tema</button>
+      <button class="btn ghost more-out" data-act="logout" style="margin-top:8px;width:100%;justify-content:center">${ic("logout")} Sair da conta</button>`;
   }
   document.addEventListener("click",e=>{
     const b=e.target.closest("[data-ui]");if(!b)return;const a=b.dataset.ui;
@@ -65,5 +66,6 @@
   const _sv=syncVisibility;syncVisibility=function(){_sv();renderPromo()};
   // rótulos para o menu recolhido (só ícones)
   document.querySelectorAll("#tabs a[data-v]").forEach(a=>{a.title=a.textContent.trim();const t=a.childNodes[a.childNodes.length-1];if(t&&t.nodeType===3){const sp=document.createElement("span");sp.className="tab-lbl";sp.textContent=t.textContent;a.replaceChild(sp,t)}});
+  (function(){const tabs=document.getElementById("tabs");if(!tabs||tabs.querySelector(".tab-out"))return;const b=document.createElement("button");b.type="button";b.className="tab-out";b.dataset.act="logout";b.title="Sair da conta";b.innerHTML=`${ic("logout")}<span class="tab-lbl">Sair</span>`;tabs.appendChild(b)})();
   applyTheme(getTheme());syncNav();syncVisibility();
 })();

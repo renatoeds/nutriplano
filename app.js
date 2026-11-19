@@ -830,7 +830,7 @@ async function renderAccessList(){
 }
 function renderPerfil(){
   const P=S.profile;const cy=P.cycle||{on:false,trainDays:4,shift:200};
-  $("#app").innerHTML=`<div class="row" style="margin-bottom:14px"><h1 style="margin:0">Perfil e metas</h1><span class="sp"></span><span class="small muted">${esc(S.user.email)}</span><button class="btn sm" data-act="logout">${ic("logout",15)} Sair</button></div>
+  $("#app").innerHTML=`<div class="row" style="margin-bottom:14px"><h1 style="margin:0">Perfil e metas</h1><span class="sp"></span><span class="small muted">${esc(S.user.email)}</span></div>
   <div class="grid g2"><div>
    <div class="card" style="margin-bottom:14px"><h2>Dados e objetivo</h2>${profileFormHTML(P,false)}<div style="margin-top:14px" id="pfprev"></div>
     <label class="switch small" style="margin-top:12px"><input type="checkbox" id="pf_addex" ${P.addExercise?"checked":""}> Somar calorias gastas no treino à meta do dia</label>
